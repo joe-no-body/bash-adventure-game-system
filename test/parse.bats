@@ -32,3 +32,11 @@ load '../node_modules/bats-assert/load'
   assert_output --partial "dobject=stick"
   assert_output --partial "iobject="
 }
+
+@test "parse 'take the stick'" {
+  run bash lib/parse.bash take the stick
+  assert_success
+  assert_output --partial "verb=take"
+  assert_output --partial "dobject=stick"
+  assert_output --partial "iobject="
+}

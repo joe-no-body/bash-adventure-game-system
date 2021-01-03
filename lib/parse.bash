@@ -1,7 +1,15 @@
 parse() {
   verb="$1"
-  dobject="$2"
-  iobject="$3"
+  shift
+
+  if test "$1" == "the"; then
+    shift
+  fi
+
+  dobject="$1"
+
+  shift
+  iobject="$1"
 }
 
 parse::main() {
