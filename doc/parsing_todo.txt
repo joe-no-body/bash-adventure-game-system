@@ -1,0 +1,12 @@
+X look
+X yell
+X go north
+- take stick
+  verb=take
+  noun=stick
+- take the stick
+- take the leaflet from the mailbox
+
+
+- take the
+  produce error

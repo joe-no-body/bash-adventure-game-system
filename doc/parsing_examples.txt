@@ -1,0 +1,89 @@
+===== VERB =====
+
+look
+  verb=look
+
+yell
+  verb=yell
+
+north
+  verb=north
+  ; this should be equivalent to "go north"
+
+inventory
+  verb=inventory
+
+
+===== VERB [ARTICLE] DOBJECT =====
+
+
+go north
+  verb=go
+  dobject=north
+
+go inside
+  verb=go
+  dobject=inside
+
+take gold
+  verb=take
+  dobject=gold
+
+take the gold
+  verb=take
+  dobject=gold
+
+open the door
+  verb=open
+  dobject=door
+
+attack the troll
+  verb=attack
+  dobject=troll
+
+INVALID: go the north
+  ; ideally, return a parse error
+  ; maybe for now we don't care
+
+===== VERB PREP [article] DOBJECT =====
+
+look to the north
+  ; equivalent to "look north"
+  verb=look
+  dobject=north
+
+; would be cool to handle these differently:
+
+look in the bag
+  verb=look in
+  dobject=bag
+look at the bag
+  verb=look at
+  dobject=bag
+
+===== VERB [ARTICLE] DOBJECT PREP [ARTICLE] IOBJECT =====
+
+give gold to troll
+  verb=give
+  dobject=gold
+  iobject=troll
+
+give the gold to the troll
+  verb=give
+  dobject=gold
+  iobject=troll
+
+attack the troll with the sword
+  verb=attack
+  dobject=troll
+  iobject=sword
+
+===== invalid =====
+
+"the" by itself
+at
+in
+troll
+sword
+troll with the sword
+attack the troll with

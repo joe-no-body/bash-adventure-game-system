@@ -1,5 +1,7 @@
 parse::main() {
   echo verb="$1"
+  echo dobject="$2"
+  echo iobject="$3"
 }
 
 # Allow running directly for simplified testing.
