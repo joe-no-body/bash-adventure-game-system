@@ -1,51 +1,56 @@
-declare -A DATA
+#!/usr/bin/env bash
 
-info() {
-  : echo "# $*" >&2
-}
+set -e
+
+declare -A DATA
 
 DATA=(
   [object::foo/testvar]='foo-specific value'
   [object::bar/testvar]='bar-specific value'
   # TODO: handle nested values
-  #[object::bar/nested/xyz]='nested value'
+  [object::bar/nested/xyz]='nested value'
 )
 
 bind_vars() {
   # TODO: make the data source an argument here
   # TODO: add unique prefixes to the local names so they don't get overridden
-  local prefix key varname value
+  local prefix key varname
   prefix="$1"
 
   for key in "${!DATA[@]}"; do
-    info "Checking key $key"
-
     # match prefix
     if [[ "$key" != "$prefix/"* ]]; then
-      info "Key $key doesn't match prefix $prefix/"
       continue
     fi
 
     # strip the prefix to get the variable name
     varname="${key#*/}"
 
-    value="${DATA["$key"]}"
-    info "Assigning $varname=$value"
+    # ignore nested values
+    if [[ "$varname" == */* ]]; then
+      continue
+    fi
 
-    local "$varname"="$value"
+    local -n "$varname"="DATA[$key]"
   done
 
-  info "Executing cmd $*"
   "$@"
 }
 
 object::foo() {
   echo "object::foo - testvar=$testvar"
+  testvar='updated by foo'
 }
 
 object::bar() {
   echo "object::bar - testvar=$testvar"
+  testvar='updated by bar'
 }
+
+bind_vars object::foo
+bind_vars object::bar
+
+echo "Once again"
 
 bind_vars object::foo
 bind_vars object::bar
