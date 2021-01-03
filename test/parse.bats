@@ -48,3 +48,9 @@ load '../node_modules/bats-assert/load'
   assert_output --partial "dobject=troll"
   assert_output --partial "iobject=sword"
 }
+
+@test "throw parse error if first word isn't a verb" {
+  run bash lib/parse.bash the
+  assert_failure
+  assert_output "parse error"
+}

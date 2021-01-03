@@ -1,4 +1,12 @@
+err() {
+  echo "$*" >&2
+}
+
 parse() {
+  if [[ "$1" == "the" ]]; then
+    return 1
+  fi
+
   verb="$1"
   shift
 
@@ -19,7 +27,10 @@ parse() {
 parse::main() {
   local verb= dobject= iobject=
 
-  parse "$@"
+  if ! parse "$@"; then
+    err "parse error"
+    return 1
+  fi
 
   echo verb="$verb"
   echo dobject="$dobject"
@@ -29,4 +40,5 @@ parse::main() {
 # Allow running directly for simplified testing.
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
   parse::main "$@"
+  exit $?
 fi
