@@ -5,7 +5,7 @@ X take stick
   verb=take
   noun=stick
 X take the stick
-- attack troll with sword
+X attack troll with sword
 - attack the troll with the sword
 - take the leaflet from the mailbox
 
@@ -13,4 +13,4 @@ X take the stick
 Return errors for:
 - take the
 - take from mailbox
-- the
+X the

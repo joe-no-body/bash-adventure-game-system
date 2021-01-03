@@ -6,7 +6,9 @@ POS=(
   [with]=preposition
 
   [look]=verb
-  [view]=verb|noun
   [sword]=noun
   [troll]=noun
+  [bag]=noun
+  [leaflet]=noun
+  [mailbox]=noun
 )

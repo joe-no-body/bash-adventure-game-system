@@ -28,11 +28,11 @@ take gold
   verb=take
   dobject=gold
 
-take the gold
+take the gold   VERB ART NOUN
   verb=take
   dobject=gold
 
-open the door
+open the door   VERB ART NOUN
   verb=open
   dobject=door
 
@@ -52,6 +52,7 @@ look to the north
   dobject=north
 
 take in the view
+view the scenery
 
 ; would be cool to handle these differently:
 
