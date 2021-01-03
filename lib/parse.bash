@@ -1,5 +1,5 @@
 parse::main() {
-  echo hi
+  echo verb="$1"
 }
 
 # Allow running directly for simplified testing.
