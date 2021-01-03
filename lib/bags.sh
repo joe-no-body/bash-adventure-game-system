@@ -10,8 +10,6 @@ set -o noglob
 \unalias -a
 hash -r
 
-enable -n logout
-
 # safer IFS, though it shouldn't matter if we're safe
 IFS=$' \t\n'
 
