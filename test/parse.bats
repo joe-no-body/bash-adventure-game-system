@@ -40,3 +40,11 @@ load '../node_modules/bats-assert/load'
   assert_output --partial "dobject=stick"
   assert_output --partial "iobject="
 }
+
+@test "parse 'attack troll with sword'" {
+  run bash lib/parse.bash attack troll with sword
+  assert_success
+  assert_output --partial "verb=attack"
+  assert_output --partial "dobject=troll"
+  assert_output --partial "iobject=sword"
+}

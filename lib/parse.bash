@@ -2,13 +2,17 @@ parse() {
   verb="$1"
   shift
 
-  if test "$1" == "the"; then
+  if [[ "$1" == "the" ]]; then
     shift
   fi
 
   dobject="$1"
-
   shift
+
+  if [[ "$1" == "with" ]]; then
+    shift
+  fi
+
   iobject="$1"
 }
 

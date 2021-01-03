@@ -16,7 +16,6 @@ inventory
 
 ===== VERB [ARTICLE] DOBJECT =====
 
-
 go north
   verb=go
   dobject=north
@@ -51,6 +50,8 @@ look to the north
   ; equivalent to "look north"
   verb=look
   dobject=north
+
+take in the view
 
 ; would be cool to handle these differently:
 
