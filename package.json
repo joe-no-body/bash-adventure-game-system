@@ -1,0 +1,21 @@
+{
+  "name": "bash-adventure-game-system",
+  "version": "1.0.0",
+  "description": "A text adventure game engine for bash.",
+  "main": "bags.sh",
+  "directories": {
+    "doc": "doc",
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "bats test"
+  },
+  "author": "joe-no-body",
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "bats": "^1.2.1",
+    "bats-assert": "git+https://github.com/ztombol/bats-assert.git",
+    "bats-support": "git+https://github.com/ztombol/bats-support.git"
+  }
+}
