@@ -1,12 +1,16 @@
 X look
 X yell
 X go north
-- take stick
+X take stick
   verb=take
   noun=stick
-- take the stick
+X take the stick
+- attack troll with sword
+- attack the troll with the sword
 - take the leaflet from the mailbox
 
 
+Return errors for:
 - take the
-  produce error
+- take from mailbox
+- the
