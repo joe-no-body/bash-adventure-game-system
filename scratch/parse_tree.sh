@@ -19,17 +19,6 @@ debug() {
   : echo "$@" >&2
 }
 
-in?() {
-  local needle="$1"
-  shift
-  for arg; do
-    if [[ "$needle" == "$arg" ]]; then
-      return
-    fi
-  done
-  return 1
-}
-
 parse() {
   verb= dobj= iobj=
 
