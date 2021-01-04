@@ -10,8 +10,20 @@ export PATH=""
 
 # Behold, the syntax tree itself.
 # Each key in this associative array represents a valid input prefix. The
-# corresponding value contains either a space-delimited list of tokens that are
-# valid after the given prefix, an empty string if the
+# corresponding value can be of two possible types (or three, depending on how
+# you want to count):
+#   1. a space-delimited list of valid tokens following the prefix
+#   2. an empty string if the prefix constitutes one whole valid input and
+#      should not have any tokens after it
+#   3. if the prefix ends with 'TERM', the name of a function, prefixed with
+#      '@', specifying the action handler for the verb
+# Token lists may consist of the following:
+#   - literal strings, consisting of single, all-lowercase words
+#   - 'OBJ', representing a noun that should be taken as an object of the
+#     sentence. the first OBJ is the direct object, the second (if provided) is
+#     the indirect object, and more than two is an error
+#   - 'TERM', which can only appear in the key of the array and is appended to
+#     the prefix after parsing the full input to denote that it is complete.
 declare -A tree=(
   [look]='at in inside OBJ'
   [look TERM]='@verb::look'
@@ -77,9 +89,6 @@ parse() {
     input_word="$1"
     shift
 
-    # TODO: produce a useful error if $possible_tokens is empty, because right
-    # now it does nothing
-
     debug "parsing word '$input_word' - prefix='$prefix' possible_tokens='$possible_tokens'"
 
     # postfix is the term that will be appended to the prefix. if postfix is
@@ -142,14 +151,19 @@ parse() {
   debug "done matching tokens. our terminal prefix is now '$terminal_prefix'"
 
   if [[ ! -v tree["$terminal_prefix"] ]]; then
-    echo "syntax error - unexpected end of input"
+    echo "syntax error - unexpected end of input - no terminal prefix matches this string"
     return 1
   fi
 
   verb_="${tree["$terminal_prefix"]}"
 
-  if [[ "${verb_:0:1}" == "" ]]; then
-    echo "syntax error - input terminated unexpectedly after '$prefix'" >&2
+  if [[ "$verb_" == "" ]]; then
+    echo "internal error - unexpectedly empty tree value for '$terminal_prefix'" >&2
+    return 1
+  fi
+
+  if [[ "${verb_:0:1}" != "@" ]]; then
+    echo "internal error - the value for '$terminal_prefix', '$verb_', does not start with @ as expected" >&2
     return 1
   fi
 
