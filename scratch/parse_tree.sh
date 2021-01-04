@@ -13,10 +13,29 @@ declare -A tree=(
   [look in]='OBJ'
   [look in OBJ]='@verb::look-inside'
   [look in OBJ TERM]='@verb::look-inside'
+  [yell]=''
+  [yell TERM]='@verb::yell'
+  [go]='OBJ'
+  [go OBJ]=''
+  [go OBJ TERM]='@verb::go'
+  # TODO: don't use a kludge to handle articles
+  [take]='the OBJ'
+  [take the]='OBJ'
+  [take the OBJ]=''
+  [take the OBJ TERM]='@verb::take'
+  [take OBJ]=''
+  [take OBJ TERM]='@verb::take'
+  [attack]='OBJ'
+  [attack OBJ]='with'
+  [attack OBJ with]='OBJ'
+  [attack OBJ with OBJ]=''
+  [attack OBJ with OBJ TERM]='@verb::attack'
 )
 
 debug() {
-  : echo "$@" >&2
+  if [[ "${DEBUG:-}" == 1 ]]; then
+    echo "$@" >&2
+  fi
 }
 
 parse() {
@@ -27,16 +46,16 @@ parse() {
   prefix="$1"
   shift
 
+  # bail out if the first word isn't matched
+  if [[ ! -v tree["$prefix"] ]]; then
+    echo "syntax error - invalid token '$prefix'"
+    exit 1
+  fi
+
   # find the first word in the lookup table
   possible_tokens="${tree["$prefix"]}"
 
   debug "initial state - prefix='$prefix' possible_tokens='$possible_tokens'"
-
-  # bail out if the first word isn't matched
-  if [[ "$possible_tokens" == "" ]]; then
-    echo "syntax error - invalid token $1"
-    exit 1
-  fi
 
   # now, for each word after the first, we're going to check if it's a valid
   # token for the current prefix, handle it as a noun if it's an object (TODO),
@@ -92,6 +111,15 @@ parse() {
 
     # now we update the prefix with the postfix
     prefix="$prefix $postfix"
+
+    # bail out if the new prefix is invalid
+    if [[ ! -v tree["$prefix"] ]]; then
+      echo "syntax error - prefix '$prefix' doesn't match a known prefix"
+      exit 1
+    fi
+
+    # find the word in the lookup table
+    possible_tokens="${tree["$prefix"]}"
   done
 
 
