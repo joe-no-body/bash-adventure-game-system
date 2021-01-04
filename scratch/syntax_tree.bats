@@ -2,7 +2,7 @@ load '../node_modules/bats-support/load'
 load '../node_modules/bats-assert/load'
 
 @test "parse standalone verb 'look'" {
-  run bash scratch/parse_tree.sh look
+  run bash scratch/syntax_tree.sh look
   assert_success
   assert_output --partial "verb=verb::look"
   assert_output --partial "dobject="
@@ -10,7 +10,7 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "parse standalone verb 'yell'" {
-  run bash scratch/parse_tree.sh yell
+  run bash scratch/syntax_tree.sh yell
   assert_success
   assert_output --partial "verb=verb::yell"
   assert_output --partial "dobject="
@@ -18,7 +18,7 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "parse 'go north'" {
-  run bash scratch/parse_tree.sh go north
+  run bash scratch/syntax_tree.sh go north
   assert_success
   assert_output --partial "verb=verb::go"
   assert_output --partial "dobject=north"
@@ -26,7 +26,7 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "parse 'take stick'" {
-  run bash scratch/parse_tree.sh take stick
+  run bash scratch/syntax_tree.sh take stick
   assert_success
   assert_output --partial "verb=verb::take"
   assert_output --partial "dobject=stick"
@@ -34,7 +34,7 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "parse 'take the stick'" {
-  run bash scratch/parse_tree.sh take the stick
+  run bash scratch/syntax_tree.sh take the stick
   assert_success
   assert_output --partial "verb=verb::take"
   assert_output --partial "dobject=stick"
@@ -42,7 +42,7 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "parse 'attack troll with sword'" {
-  run bash scratch/parse_tree.sh attack troll with sword
+  run bash scratch/syntax_tree.sh attack troll with sword
   assert_success
   assert_output --partial "verb=verb::attack"
   assert_output --partial "dobject=troll"
@@ -50,13 +50,13 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "throw parse error if first word isn't a verb" {
-  run bash scratch/parse_tree.sh the
+  run bash scratch/syntax_tree.sh the
   assert_failure
   assert_output --partial "syntax error"
 }
 
 @test "throw a useful error if input terminates unexpectedly" {
-  run bash scratch/parse_tree.sh attack
+  run bash scratch/syntax_tree.sh attack
   assert_failure
   assert_output --partial "syntax error"
   assert_output --partial "unexpected end of input"
