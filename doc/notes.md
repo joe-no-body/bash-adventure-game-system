@@ -59,6 +59,24 @@ API
 - `$verb`
 - `$direct_object`
 - `$indirect_object`
+- `$POS` (map) - mapping from input terms to parts of speech
+    - e.g. `the` is an `article`, `look` is a `verb`, etc.
+    - populated automatically by `synonyms:`, `adjectives:`, and `verb::VERB`
+      declarations
+- `$object_names` (map) - mapping from noun phrases to internal object names.
+    - e.g. for the `object::lantern` declaration above, `$object_names` would
+      contain entries
+      ```
+      [lantern]=object::lantern
+      [lamp]=object::lantern
+      [light]=object::lantern
+      [brass lantern]=object::lantern
+      [brass lamp]=object::lantern
+      [brass light]=object::lantern
+      ```
+    - TODO: figure out how to deal with objects that are called the same thing.
+      ideally, you'd only need to disambiguate with an adjective in the case
+      that both items are present
 
 ### Main loop
 
@@ -76,8 +94,8 @@ API
 - `move OBJ to DEST` - move OBJ into the object DEST
 - `remove OBJ` - move object to the shadow realm (this makes it hidden and unreachable, but its state, etc. continues to exist if it's ever `move`d back into reality)
 - `in? OBJ CONTAINER` - check if OBJ is located in CONTAINER
-- `contents_of CONTAINER` - return contents
-- `exits_from ROOM`
+- `contents_of CONTAINER` - return contents of the object
+- `exits_from ROOM` - return exits from the room
 
 #### Flags
 
@@ -121,7 +139,14 @@ if the lantern is lit; then
     :
 fi
 
-if the bag contains the cookies; then
-    :
-fi
+the lantern is here
+the bag contains the cookies
+
+# or maybe
+
+object::lantern is takable
+object::lantern is lit
+object::bag contains object::cookies
+ 
+
 ```
