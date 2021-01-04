@@ -54,3 +54,10 @@ load '../node_modules/bats-assert/load'
   assert_failure
   assert_output --partial "syntax error"
 }
+
+@test "throw a useful error if input terminates unexpectedly" {
+  run bash scratch/parse_tree.sh attack
+  assert_failure
+  assert_output --partial "syntax error"
+  assert_output --partial "unexpected end of input"
+}

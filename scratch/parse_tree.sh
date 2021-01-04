@@ -1,7 +1,17 @@
+#!/usr/bin/env bash
+# A proof of concept syntax tree-thing implemented in pure motherfucking Bash.
+
+# Gotta stay safe out there.
 set -euo pipefail
 
+# We don't need binaries where we're going. Out here, it's just us and the
+# shell.
 export PATH=""
 
+# Behold, the syntax tree itself.
+# Each key in this associative array represents a valid input prefix. The
+# corresponding value contains either a space-delimited list of tokens that are
+# valid after the given prefix, an empty string if the
 declare -A tree=(
   [look]='at in inside OBJ'
   [look TERM]='@verb::look'
@@ -18,7 +28,9 @@ declare -A tree=(
   [go]='OBJ'
   [go OBJ]=''
   [go OBJ TERM]='@verb::go'
-  # TODO: don't use a kludge to handle articles
+  # TODO: fix this
+  # I added 'the' as a valid token here to make my other parser's tests pass,
+  # but that should obviously be handled differently
   [take]='the OBJ'
   [take the]='OBJ'
   [take the OBJ]=''
@@ -64,6 +76,9 @@ parse() {
     # input word is the word we just got
     input_word="$1"
     shift
+
+    # TODO: produce a useful error if $possible_tokens is empty, because right
+    # now it does nothing
 
     debug "parsing word '$input_word' - prefix='$prefix' possible_tokens='$possible_tokens'"
 
@@ -125,6 +140,12 @@ parse() {
 
   terminal_prefix="$prefix TERM"
   debug "done matching tokens. our terminal prefix is now '$terminal_prefix'"
+
+  if [[ ! -v tree["$terminal_prefix"] ]]; then
+    echo "syntax error - unexpected end of input"
+    return 1
+  fi
+
   verb_="${tree["$terminal_prefix"]}"
 
   if [[ "${verb_:0:1}" == "" ]]; then
