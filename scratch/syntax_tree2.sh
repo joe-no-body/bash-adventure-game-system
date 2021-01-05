@@ -38,8 +38,11 @@ parse() {
   # if prefix + TERM is not in the tree, error
   # otherwise, return successfully
   verb= dobject= iobject=
+  # -l ensures that word will always be converted to lower case for consistency
+  local -l word
+  word="$1"
 
-  prefix="$1"
+  prefix="$word"
   raw_prefix="$1"
   shift
 
