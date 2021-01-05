@@ -2,41 +2,31 @@ set -euo pipefail
 # My second attempt at a rudimentary syntax tree-type thing in Bash.
 
 # The tree is represented as an associative array of valid prefixes, with full
-# valid sentences being denoted by a period at the end.
+# valid sentences structures being denoted by a value referencing a
+# corresponding verb function.
 declare -A tree=(
-  [yell]=
-  [yell .]=@verb::yell
+  [yell]=@verb::yell
 
-  [look]=
-  [look .]=@verb::look
+  [look]=@verb::look
 
-  [look OBJ]=
-  [look OBJ .]=@verb::look
+  [look OBJ]=@verb::look
 
   [look in]=
-  [look in OBJ]=
-  [look in OBJ .]=@verb::look-inside
+  [look in OBJ]=@verb::look-inside
 
   [look at]=
-  [look at OBJ]=
-  [look at OBJ .]=@verb::look
+  [look at OBJ]=@verb::look
 
   [look at OBJ with]=
-  [look at OBJ with OBJ]=
-  [look at OBJ with OBJ .]=@verb::look-with
+  [look at OBJ with OBJ]=@verb::look-with
 )
-
-null?() {
-  [[ "$1" == "" ]]
-}
 
 grammatical?() {
   [[ -v tree["$1"] ]]
 }
 
 complete?() {
-  local prefix="$1 ."
-  grammatical? "$prefix" && ! null? "${tree["$prefix"]}"
+  [[ -v tree["$1"] ]] && [[ "${tree["$1"]}" != "" ]]
 }
 
 get-verb() {
@@ -46,7 +36,7 @@ get-verb() {
   if ! complete? "$prefix"; then
     syntax_error "Your sentence seems to end before it's meant to be finished."
   fi
-  echo "${tree["$prefix ."]}"
+  echo "${tree["$prefix"]}"
 }
 
 syntax_error() {
@@ -59,7 +49,7 @@ parse() {
   #   if the prefix + word is in the tree, continue
   #   if the prefix + "OBJ" is in the tree, parse an object and continue
   #   error
-  # if prefix + . is not in the tree, error
+  # if tree[prefix] is null, error
   # otherwise, return successfully
   verb= dobject= iobject=
   # -l ensures that word will always be converted to lower case for consistency
