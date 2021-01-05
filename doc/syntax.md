@@ -59,6 +59,10 @@ set_attr() {
     DATA["$obj/$1"]="$2"
 }
 
+add_exit() {
+    set_attr exits/"$1" "$*"
+}
+
 called:() {
     set_attr display_name "$1"
 }
