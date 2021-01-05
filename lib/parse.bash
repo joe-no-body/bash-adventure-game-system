@@ -77,7 +77,7 @@ get-verb() {
 }
 
 syntax_error() {
-  echo "syntax error: $*" >&2
+  error="$*"
   return 1
 }
 
@@ -104,6 +104,7 @@ parse() {
 
   if ! grammatical? "$prefix"; then
     syntax_error "invalid sentence start '$prefix'"
+    return 1
   fi
 
   for word; do
@@ -126,11 +127,13 @@ parse() {
         continue
       else
         syntax_error "unexpected object in pattern '$prefix OBJ'"
+        return 1
       fi
     fi
 
     # failed to match a literal or an object -> error
     syntax_error "I can't make sense of '$word' at the end of '$raw_prefix'"
+    return 1
   done
 
   if ! complete? "$prefix"; then
@@ -142,6 +145,7 @@ parse() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  error=
   set -euo pipefail
   syntax yell = verb::yell
 
@@ -158,6 +162,9 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
   syntax attack OBJ with OBJ = verb::attack
 
   verb= dobject= iobject=
-  parse "$@"
+  if ! parse "$@" || [[ "$error" ]]; then
+    echo "syntax error: $error" >&2
+    exit 1
+  fi
   echo "verb=$verb dobject=$dobject iobject=$iobject"
 fi
