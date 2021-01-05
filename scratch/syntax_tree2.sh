@@ -1,28 +1,29 @@
 set -euo pipefail
 # My second attempt at a rudimentary syntax tree-type thing in Bash.
 
-# The tree is represented as an associative array of valid prefixes.
+# The tree is represented as an associative array of valid prefixes, with full
+# valid sentences being denoted by a period at the end.
 declare -A tree=(
   [yell]=
-  [yell TERM]=@verb::yell
+  [yell .]=@verb::yell
 
   [look]=
-  [look TERM]=@verb::look
+  [look .]=@verb::look
 
   [look OBJ]=
-  [look OBJ TERM]=@verb::look
+  [look OBJ .]=@verb::look
 
   [look in]=
   [look in OBJ]=
-  [look in OBJ TERM]=@verb::look-inside
+  [look in OBJ .]=@verb::look-inside
 
   [look at]=
   [look at OBJ]=
-  [look at OBJ TERM]=@verb::look
+  [look at OBJ .]=@verb::look
 
   [look at OBJ with]=
   [look at OBJ with OBJ]=
-  [look at OBJ with OBJ TERM]=@verb::look-with
+  [look at OBJ with OBJ .]=@verb::look-with
 )
 
 syntax_error() {
@@ -35,7 +36,7 @@ parse() {
   #   if the prefix + word is in the tree, continue
   #   if the prefix + "OBJ" is in the tree, parse an object and continue
   #   error
-  # if prefix + TERM is not in the tree, error
+  # if prefix + . is not in the tree, error
   # otherwise, return successfully
   verb= dobject= iobject=
   # -l ensures that word will always be converted to lower case for consistency
@@ -77,18 +78,18 @@ parse() {
     syntax_error "I can't make sense of '$word' at the end of '$raw_prefix'"
   done
 
-  if [[ ! -v tree["$prefix TERM"] ]] || [[ "${tree["$prefix TERM"]}" == "" ]]; then
+  if [[ ! -v tree["$prefix ."] ]] || [[ "${tree["$prefix ."]}" == "" ]]; then
     syntax_error "Your sentence seems to end before it's meant to be finished."
   fi
 
   # set verb
-  verb="${tree["$prefix TERM"]}"
+  verb="${tree["$prefix ."]}"
 }
 
 main() {
   verb= dobject= iobject=
   parse "$@"
-  echo "verb=$verb dobject=$dobject iobject=$iobject"
+  echo "verb='$verb' dobject='$dobject' iobject='$iobject'"
 }
 
 main "$@"
