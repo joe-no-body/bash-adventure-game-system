@@ -13,20 +13,10 @@ hash -r
 # safer IFS, though it shouldn't matter if we're safe
 IFS=$' \t\n'
 
-source lib/parse.bash   # FIXME: use BASH_SOURCE here
-
-func?() {
-  declare -F "$1" &>/dev/null
-}
-
-perform() {
-  local verb="$1" dobject="$2" iobject="$3"
-  echo verb="$verb"
-  echo dobject="$dobject"
-  echo iobject="$iobject"
-
-
-}
+# FIXME: use BASH_SOURCE here
+source lib/parse.bash
+source lib/perform.bash
+source lib/utils.bash
 
 bags::main() {
   local verb= dobject= iobject= error=
