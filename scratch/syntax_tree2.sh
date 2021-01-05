@@ -26,6 +26,29 @@ declare -A tree=(
   [look at OBJ with OBJ .]=@verb::look-with
 )
 
+null?() {
+  [[ "$1" == "" ]]
+}
+
+grammatical?() {
+  [[ -v tree["$1"] ]]
+}
+
+complete?() {
+  local prefix="$1 ."
+  grammatical? "$prefix" && ! null? "${tree["$prefix"]}"
+}
+
+get-verb() {
+  local prefix
+  prefix="$1"
+
+  if ! complete? "$prefix"; then
+    syntax_error "Your sentence seems to end before it's meant to be finished."
+  fi
+  echo "${tree["$prefix ."]}"
+}
+
 syntax_error() {
   echo "syntax error: $*" >&2
   return 1
@@ -47,20 +70,20 @@ parse() {
   raw_prefix="$1"
   shift
 
-  if [[ ! -v tree["$prefix"] ]]; then
+  if ! grammatical? "$prefix"; then
     syntax_error "invalid sentence start '$prefix'"
   fi
 
   for word; do
     raw_prefix="$raw_prefix $word"
     # try matching a literal
-    if [[ -v tree["$prefix $word"] ]]; then
+    if grammatical? "$prefix $word"; then
       prefix="$prefix $word"
       continue
     fi
 
     # try matching an object
-    if [[ -v tree["$prefix OBJ"] ]]; then
+    if grammatical? "$prefix OBJ"; then
       if [[ "$dobject" == "" ]]; then
         dobject="$word"
         prefix="$prefix OBJ"
@@ -78,12 +101,8 @@ parse() {
     syntax_error "I can't make sense of '$word' at the end of '$raw_prefix'"
   done
 
-  if [[ ! -v tree["$prefix ."] ]] || [[ "${tree["$prefix ."]}" == "" ]]; then
-    syntax_error "Your sentence seems to end before it's meant to be finished."
-  fi
-
   # set verb
-  verb="${tree["$prefix ."]}"
+  verb="$(get-verb "$prefix")"
 }
 
 main() {
