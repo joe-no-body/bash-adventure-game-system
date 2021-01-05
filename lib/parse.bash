@@ -5,30 +5,58 @@ set -euo pipefail
 # valid sentences structures being denoted by a value referencing a
 # corresponding verb function.
 declare -A tree=(
-  [yell]=verb::yell
+  # [yell]=verb::yell
 
-  [go]=
-    [go OBJ]=verb::go
+  # [go]=
+  #   [go OBJ]=verb::go
 
-  [take]=
-    [take OBJ]=verb::take
-    [take the]=
-      [take the OBJ]=verb::take
+  # [take]=
+  #   [take OBJ]=verb::take
+  #   [take the]=
+  #     [take the OBJ]=verb::take
 
-  [look]=verb::look
-    [look OBJ]=verb::look
-    [look in]=
-      [look in OBJ]=verb::look-inside
-    [look at]=
-      [look at OBJ]=verb::look
-        [look at OBJ with]=
-          [look at OBJ with OBJ]=verb::look-with
+  # [look]=verb::look
+  #   [look OBJ]=verb::look
+  #   [look in]=
+  #     [look in OBJ]=verb::look-inside
+  #   [look at]=
+  #     [look at OBJ]=verb::look
+  #       [look at OBJ with]=
+  #         [look at OBJ with OBJ]=verb::look-with
 
-  [attack]=
-    [attack OBJ]=
-      [attack OBJ with]=
-        [attack OBJ with OBJ]=verb::attack
+  # [attack]=
+  #   [attack OBJ]=
+  #     [attack OBJ with]=
+  #       [attack OBJ with OBJ]=verb::attack
 )
+
+# syntax attack OBJ with OBJ = verb::attack
+syntax() {
+  local -a syntax
+  local word verb_func
+
+  while (( "$#" )); do
+    word="$1"
+    shift
+    if [[ "$word" == '=' ]]; then
+      break
+    fi
+    syntax+=("$word")
+  done
+
+  verb_func="$1"
+
+  local -a prefix
+  local prefix_str
+  for word in "${syntax[@]}"; do
+    prefix+=("$word")
+    prefix_str="${prefix[*]}"
+    if [[ "${tree["$prefix_str"]+exists}" == '' ]]; then
+      tree["$prefix_str"]=''
+    fi
+  done
+  tree["$prefix_str"]="$verb_func"
+}
 
 grammatical?() {
   [[ -v tree["$1"] ]]
@@ -114,6 +142,20 @@ parse() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  syntax yell = verb::yell
+
+  syntax look = verb::look
+  syntax look OBJ = verb::look
+  syntax look in OBJ = verb::look-inside
+  syntax look at OBJ = verb::look
+
+  syntax go OBJ = verb::go
+
+  syntax take OBJ = verb::take
+  syntax take the OBJ = verb::take
+
+  syntax attack OBJ with OBJ = verb::attack
+
   verb= dobject= iobject=
   parse "$@"
   echo "verb=$verb dobject=$dobject iobject=$iobject"
