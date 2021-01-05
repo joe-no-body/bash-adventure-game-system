@@ -5,20 +5,29 @@ set -euo pipefail
 # valid sentences structures being denoted by a value referencing a
 # corresponding verb function.
 declare -A tree=(
-  [yell]=@verb::yell
+  [yell]=verb::yell
 
-  [look]=@verb::look
+  [go]=
+    [go OBJ]=verb::go
 
-  [look OBJ]=@verb::look
+  [take]=
+    [take OBJ]=verb::take
+    [take the]=
+      [take the OBJ]=verb::take
 
-  [look in]=
-  [look in OBJ]=@verb::look-inside
+  [look]=verb::look
+    [look OBJ]=verb::look
+    [look in]=
+      [look in OBJ]=verb::look-inside
+    [look at]=
+      [look at OBJ]=verb::look
+        [look at OBJ with]=
+          [look at OBJ with OBJ]=verb::look-with
 
-  [look at]=
-  [look at OBJ]=@verb::look
-
-  [look at OBJ with]=
-  [look at OBJ with OBJ]=@verb::look-with
+  [attack]=
+    [attack OBJ]=
+      [attack OBJ with]=
+        [attack OBJ with OBJ]=verb::attack
 )
 
 grammatical?() {
@@ -34,14 +43,20 @@ get-verb() {
   prefix="$1"
 
   if ! complete? "$prefix"; then
-    syntax_error "Your sentence seems to end before it's meant to be finished."
+    internal_error "get-verb got an incomplete sentence: '$prefix'"
   fi
+
   echo "${tree["$prefix"]}"
 }
 
 syntax_error() {
   echo "syntax error: $*" >&2
   return 1
+}
+
+internal_error() {
+  echo "internal error: $*" >&2
+  exit 1
 }
 
 parse() {
@@ -91,14 +106,17 @@ parse() {
     syntax_error "I can't make sense of '$word' at the end of '$raw_prefix'"
   done
 
-  # set verb
+  if ! complete? "$prefix"; then
+    syntax_error "Your sentence seems to end before it's meant to be finished."
+  fi
+
   verb="$(get-verb "$prefix")"
 }
 
 main() {
   verb= dobject= iobject=
   parse "$@"
-  echo "verb='$verb' dobject='$dobject' iobject='$iobject'"
+  echo "verb=$verb dobject=$dobject iobject=$iobject"
 }
 
 main "$@"
