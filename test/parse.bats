@@ -4,7 +4,7 @@ load '../node_modules/bats-assert/load'
 @test "parse standalone verb 'look'" {
   run bash lib/parse.bash look
   assert_success
-  assert_output --partial "verb=look"
+  assert_output --partial "verb=verb::look"
   assert_output --partial "dobject="
   assert_output --partial "iobject="
 }
@@ -12,7 +12,7 @@ load '../node_modules/bats-assert/load'
 @test "parse standalone verb 'yell'" {
   run bash lib/parse.bash yell
   assert_success
-  assert_output --partial "verb=yell"
+  assert_output --partial "verb=verb::yell"
   assert_output --partial "dobject="
   assert_output --partial "iobject="
 }
@@ -20,7 +20,7 @@ load '../node_modules/bats-assert/load'
 @test "parse 'go north'" {
   run bash lib/parse.bash go north
   assert_success
-  assert_output --partial "verb=go"
+  assert_output --partial "verb=verb::go"
   assert_output --partial "dobject=north"
   assert_output --partial "iobject="
 }
@@ -28,7 +28,7 @@ load '../node_modules/bats-assert/load'
 @test "parse 'take stick'" {
   run bash lib/parse.bash take stick
   assert_success
-  assert_output --partial "verb=take"
+  assert_output --partial "verb=verb::take"
   assert_output --partial "dobject=stick"
   assert_output --partial "iobject="
 }
@@ -36,7 +36,7 @@ load '../node_modules/bats-assert/load'
 @test "parse 'take the stick'" {
   run bash lib/parse.bash take the stick
   assert_success
-  assert_output --partial "verb=take"
+  assert_output --partial "verb=verb::take"
   assert_output --partial "dobject=stick"
   assert_output --partial "iobject="
 }
@@ -44,7 +44,7 @@ load '../node_modules/bats-assert/load'
 @test "parse 'attack troll with sword'" {
   run bash lib/parse.bash attack troll with sword
   assert_success
-  assert_output --partial "verb=attack"
+  assert_output --partial "verb=verb::attack"
   assert_output --partial "dobject=troll"
   assert_output --partial "iobject=sword"
 }
@@ -52,5 +52,11 @@ load '../node_modules/bats-assert/load'
 @test "throw parse error if first word isn't a verb" {
   run bash lib/parse.bash the
   assert_failure
-  assert_output --partial "parse error"
+  assert_output --partial "syntax error"
+}
+
+@test "throw a useful error if input terminates unexpectedly" {
+  run bash lib/parse.bash attack
+  assert_failure
+  assert_output --partial "syntax error"
 }

@@ -1,205 +1,120 @@
 set -euo pipefail
+# My second attempt at a rudimentary syntax tree-type thing in Bash.
 
-readonly FALSE=1
-readonly UNKNOWN_WORD=2
+# The tree is represented as an associative array of valid prefixes, with full
+# valid sentences structures being denoted by a value referencing a
+# corresponding verb function.
+declare -A tree=(
+  [yell]=verb::yell
 
-declare -A POS
-POS=(
-  [the]=article
+  [go]=
+    [go OBJ]=verb::go
 
-  [from]=preposition
-  [to]=preposition
-  [with]=preposition
+  [take]=
+    [take OBJ]=verb::take
+    [take the]=
+      [take the OBJ]=verb::take
 
-  [look]=verb
-  [yell]=verb
-  [attack]=verb
-  [take]=verb
-  [go]=verb
+  [look]=verb::look
+    [look OBJ]=verb::look
+    [look in]=
+      [look in OBJ]=verb::look-inside
+    [look at]=
+      [look at OBJ]=verb::look
+        [look at OBJ with]=
+          [look at OBJ with OBJ]=verb::look-with
 
-  [sword]=noun
-  [troll]=noun
-  [bag]=noun
-  [leaflet]=noun
-  [mailbox]=noun
-  [stick]=noun
-  [north]=noun
+  [attack]=
+    [attack OBJ]=
+      [attack OBJ with]=
+        [attack OBJ with OBJ]=verb::attack
 )
 
-# returns the part of speech for $1 or failure if the word is unknown
-pos() {
-  if (( "$#" != 1 )); then
-    fatal "pos requires exactly one argument" >&2
-  fi
-
-  if [[ ! -v POS["$1"] ]]; then
-    return "$UNKNOWN_WORD"
-  fi
-
-  echo "${POS["$1"]}"
+grammatical?() {
+  [[ -v tree["$1"] ]]
 }
 
-# Determines if $1 is a known word
-word?() {
-  if (( "$#" != 1 )); then
-    fatal "word? requires exactly one argument" >&2
-  fi
-  if [[ ! -v POS["$1"] ]];then
-    return "$UNKNOWN_WORD"
-  fi
+complete?() {
+  [[ -v tree["$1"] ]] && [[ "${tree["$1"]}" != "" ]]
 }
 
-# determines if $1's part of speech is $2
-# returns 0 if $1's part of speech is $2
-# retursn 1 if $1's part of speech is not $2
-# returns 2 if the word is unknown
-pos-is?() {
-  if (( "$#" != 2 )); then
-    fatal "pos-is? must be invoked as 'pos-is? WORD POS'"
+get-verb() {
+  local prefix
+  prefix="$1"
+
+  if ! complete? "$prefix"; then
+    internal_error "get-verb got an incomplete sentence: '$prefix'"
   fi
 
-  local word expected_pos pos
-  word="$1"
-  expected_pos="$2"
-
-  if ! pos="$(pos "$1")"; then
-    return "$UNKNOWN_WORD"
-  fi
-
-  if [[ "$pos" != "$expected_pos" ]]; then
-    return "$FALSE"
-  fi
+  echo "${tree["$prefix"]}"
 }
 
-verb?() {
-  if (( "$#" != 1 )); then
-    fatal "verb? requires exactly one argument" >&2
-  fi
-  pos-is? "$1" verb
-}
-
-article?() {
-  if (( "$#" != 1 )); then
-    fatal "article? requires exactly one argument" >&2
-  fi
-  pos-is? "$1" article
-}
-
-noun?() {
-  if (( "$#" != 1 )); then
-    fatal "noun? requires exactly one argument" >&2
-  fi
-  pos-is? "$1" noun
-}
-
-preposition?() {
-  if (( "$#" != 1 )); then
-    fatal "preposition? requires exactly one argument" >&2
-  fi
-  pos-is? "$1" preposition
-}
-
-fatal() {
-  echo "fatal internal error: $*" >&2
-  exit 1
-}
-
-err() {
-  echo "$*" >&2
-}
-
-# Returns a parse error.
-# Note that this only works if errexit is set.
-parse_err() {
-  error="$1"
+syntax_error() {
+  echo "syntax error: $*" >&2
   return 1
 }
 
+internal_error() {
+  echo "internal error: $*" >&2
+  exit 1
+}
+
 parse() {
-  local pos
-  verb=
-  dobject=
-  iobject=
+  # for each word in the input:
+  #   if the prefix + word is in the tree, continue
+  #   if the prefix + "OBJ" is in the tree, parse an object and continue
+  #   error
+  # if tree[prefix] is null, error
+  # otherwise, return successfully
+  verb= dobject= iobject=
+  # -l ensures that word will always be converted to lower case for consistency
+  local -l word
+  word="$1"
 
-  verb? "$1" || parse_err "expected a verb but got $1"
-
-  verb="$1"
+  prefix="$word"
+  raw_prefix="$1"
   shift
 
-  # VERB only
-  if [[ ! "${1-}" ]]; then
-    return
+  if ! grammatical? "$prefix"; then
+    syntax_error "invalid sentence start '$prefix'"
   fi
 
-  # VERB followed by 'the'
-  if article? "$1"; then
-    shift
-    # if we got an article, then we need a noun after it
-    if [[ ! "${1-}" ]]; then
-      parse_err "input ended unexpectedly after article"
+  for word; do
+    raw_prefix="$raw_prefix $word"
+    # try matching a literal
+    if grammatical? "$prefix $word"; then
+      prefix="$prefix $word"
+      continue
     fi
-  fi
 
-  # VERB [the] NOUN
-  if ! noun? "$1"; then
-    parse_err "expected a noun after the verb but got $1"
-  fi
-  dobject="$1"
-  shift
-
-  # input stops after direct object
-  # VERB [the[ NOUN only
-  if [[ ! "${1-}" ]]; then
-    return
-  fi
-
-  # VERB [the] NOUN PREP
-  if ! preposition? "$1"; then
-    parse_err "expected a preposition after the direct object but got $1"
-  fi
-  shift
-
-  if [[ ! "${1-}" ]]; then
-    parse_err "input ended unexpectedly after preposition"
-  fi
-
-  # VERB [the] NOUN PREP [the]
-  if article? "${1-}"; then
-    shift
-
-    if [[ ! "${1-}" ]]; then
-      parse_err "input ended unexpectedly after article in indirect object phrase"
+    # try matching an object
+    if grammatical? "$prefix OBJ"; then
+      if [[ "$dobject" == "" ]]; then
+        dobject="$word"
+        prefix="$prefix OBJ"
+        continue
+      elif [[ "$iobject" == "" ]]; then
+        iobject="$word"
+        prefix="$prefix OBJ"
+        continue
+      else
+        syntax_error "unexpected object in pattern '$prefix OBJ'"
+      fi
     fi
+
+    # failed to match a literal or an object -> error
+    syntax_error "I can't make sense of '$word' at the end of '$raw_prefix'"
+  done
+
+  if ! complete? "$prefix"; then
+    syntax_error "Your sentence seems to end before it's meant to be finished."
   fi
 
-  # VERB [the] NOUN PREP [the] VERB
-  if ! noun? "${1-}"; then
-    parse_err "expected a noun after the preposition but got $1"
-  fi
-
-  iobject="$1"
+  verb="$(get-verb "$prefix")"
 }
 
-parse::main() {
-  local verb= dobject= iobject= error=
-
-  if ! parse "$@" || [[ "$error" ]]; then
-    if [[ "$error" ]]; then
-      error="parse error: $error"
-    else
-      error="parse error"
-    fi
-    err "$error"
-    return 1
-  fi
-
-  echo verb="$verb"
-  echo dobject="$dobject"
-  echo iobject="$iobject"
-}
-
-# Allow running directly for simplified testing.
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
-  parse::main "$@"
-  exit $?
+  verb= dobject= iobject=
+  parse "$@"
+  echo "verb=$verb dobject=$dobject iobject=$iobject"
 fi
