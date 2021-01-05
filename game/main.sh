@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 source lib/bags.bash
-source game/game.sh
+source game/syntax.sh
+source game/actions.sh
 
 bags::main "$@"
