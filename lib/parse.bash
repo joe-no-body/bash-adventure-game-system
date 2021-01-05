@@ -1,4 +1,3 @@
-set -euo pipefail
 # My second attempt at a rudimentary syntax tree-type thing in Bash.
 
 # The tree is represented as an associative array of valid prefixes, with full
@@ -136,12 +135,14 @@ parse() {
 
   if ! complete? "$prefix"; then
     syntax_error "Your sentence seems to end before it's meant to be finished."
+    return 1
   fi
 
   verb="$(get-verb "$prefix")"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  set -euo pipefail
   syntax yell = verb::yell
 
   syntax look = verb::look
