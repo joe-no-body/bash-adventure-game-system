@@ -5,16 +5,9 @@ debug() {
 }
 
 array?() {
-  local name="$1"
-  local decl
-  [[ -v "$name" ]] || return 2
-  # decl="$(declare -p "$name" 2>/dev/null)" || return 2
-
-  case "$(declare -p "$name" 2>/dev/null)" in
-    # declare -a array=(...)
-    # declare -l foo='...'
-    # TODO: handle other array types
-    "declare -a"*" $name=("*) return 0 ;;
+  [[ -v "$1" ]] || return 2
+  case "$(declare -p "$1" 2>/dev/null)" in
+    "declare -"*"a"*" $1=("*) return 0 ;;
   esac
   return 1
 }
