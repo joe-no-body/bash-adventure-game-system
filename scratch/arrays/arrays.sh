@@ -1,7 +1,26 @@
 #!/usr/bin/env bash
 #
-# An assortment of functions for working with arrays.
-# TODO: fix usage of locals to avoid conflicts with array names.
+# An assortment of functions that encapsulate some of bash's particularly nasty
+# array syntax.
+#
+# Arrays must be passed directly via variable name rather than by variable
+# expansion. e.g. for these arrays,
+#
+#   array1=(1 2 3)
+#   array2=(1 2 3)
+#
+# the functions would be invoked like this:
+#
+#   aequal array1 array2
+#
+# and not like this:
+#
+#   aequal "${array1[@]}" "${array2[@]}"
+#
+# FIXME: this relies on namerefs, which don't work if the given name shadows a
+# local variable. e.g. if you pass an array named `len` to `aequal`, it will
+# fail, since `__array_utils__array1` will end up referencing the local variable
+# `len` rather than the intended target of the operation.
 
 #######################################
 # Check if the given string names an array.
@@ -39,8 +58,8 @@ array?() {
 #######################################
 alen() {
   array? "$1" || return 2
-  local -n arrayref="$1"
-  printf '%s' "${#arrayref[*]}"
+  local -n __array_utils__arrayref="$1"
+  printf '%s' "${#__array_utils__arrayref[*]}"
 }
 
 #######################################
@@ -56,19 +75,18 @@ alen() {
 #   2 if either $1 or $2 does not name a valid array variable.
 #######################################
 aequal() {
+  local -n __array_utils__array1="$1" __array_utils__array2="$2"
   local len len2
   len="$(alen "$1")" || return 2
   len2="$(alen "$2")" || return 2
-  [[ "$len" == "$len2" ]] || {
+  if [[ "$len" != "$len2" ]]; then
     return 1
-  }
+  fi
 
-  local -n a="$1" b="$2"
   local i
   for ((i = 0; i < len; i++)); do
-    [[ "${a["$i"]}" == "${b["$i"]}" ]] || {
-      return 1
-    }
+    [[ "${__array_utils__array1["$i"]}" == "${__array_utils__array2["$i"]}" ]] \
+      || return 1
   done
 }
 
@@ -86,6 +104,6 @@ aequal() {
 #######################################
 ashift() {
   array? "$1" || return 2
-  local -n array="$1"
-  array=("${array[@]:1}")
+  local -n __array_utils__arrayref="$1"
+  __array_utils__arrayref=("${__array_utils__arrayref[@]:1}")
 }
