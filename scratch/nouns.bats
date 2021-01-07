@@ -3,9 +3,6 @@ load '../node_modules/bats-assert/load'
 
 setup() {
   source scratch/nouns.sh
-  nouns=(
-    [foo]=object::foo
-  )
 }
 
 @test "parsing undefined word fails" {
@@ -14,6 +11,9 @@ setup() {
 }
 
 @test "parse one word" {
+  nouns=(
+    [foo]=object::foo
+  )
   run nouns::parse foo
   assert_success
   assert_output "object::foo"
@@ -48,4 +48,55 @@ setup() {
   run nouns::parse your bar
   assert_success
   assert_output "object::bar"
+}
+
+@test "define and parse nouns with adjectives" {
+  nouns::define object::red-foo -t the -a red -s foo
+  assert [ "${nouns[the red foo]}" = "object::red-foo" ]
+  assert [ "${nouns[the foo]}" = "object::red-foo" ]
+  assert [ "${nouns[foo]}" = "object::red-foo" ]
+
+  run nouns::parse the foo
+  assert_success
+  assert_output "object::red-foo"
+
+  run nouns::parse the red foo
+  assert_success
+  assert_output "object::red-foo"
+}
+
+@test "handle multi-word nouns" {
+  nouns::define location::living-room -t the -s "living room"
+
+  run nouns::parse living room
+  assert_success
+  assert_output "location::living-room"
+
+  run nouns::parse the living room
+  assert_success
+  assert_output "location::living-room"
+}
+
+@test "handle homonymous nouns" {
+  nouns::define object::red-foo -t the -a red -s foo
+  nouns::define object::blue-foo -t the -a blue -s foo
+  assert [ "${nouns[the red foo]}" = "object::red-foo" ]
+  assert [ "${nouns[the blue foo]}" = "object::blue-foo" ]
+  assert [ "${nouns[red foo]}" = "object::red-foo" ]
+  assert [ "${nouns[blue foo]}" = "object::blue-foo" ]
+  assert [ "${nouns[the foo]}" = "object::red-foo object::blue-foo" ]
+  assert [ "${nouns[foo]}" = "object::red-foo object::blue-foo" ]
+
+  run nouns::parse the foo
+  assert_success
+  assert_output --partial "object::red-foo"
+  assert_output --partial "object::blue-foo"
+
+  run nouns::parse the red foo
+  assert_success
+  assert_output --partial "object::red-foo"
+
+  run nouns::parse the blue foo
+  assert_success
+  assert_output --partial "object::blue-foo"
 }
