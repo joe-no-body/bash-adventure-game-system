@@ -2,7 +2,8 @@
 
 # The tree is represented as an associative array of valid prefixes, with full
 # valid sentences structures being denoted by a value referencing a
-# corresponding verb function.
+# corresponding verb function. An example tree is illustrated by the comments
+# below.
 declare -A tree=(
   # [yell]=verb::yell
 
