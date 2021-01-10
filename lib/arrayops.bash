@@ -162,14 +162,15 @@ anreverse()
 #   2 if $1 is not a variable
 #######################################
 array?() {
-  [[ -v "$1" ]] || return 2
   case "$(declare -p "$1" 2>/dev/null)" in
     # this pattern only matches if the variable declaration strats approximately
     # like so, where NAME is the array name
     #   declare -a NAME=(
     # however, globs are used around `-a` to support other flags if provided
-    "declare -"*"a"*" $1=("*) return 0 ;;
+    "declare -"*"a"*" $1"*) return 0 ;;
+    "declare -"*"a"*" $1") return 0 ;;
   esac
+  [[ -v "$1" ]] || return 2
   return 1
 }
 
@@ -203,7 +204,20 @@ aequal?() {
   done
 }
 
+#######################################
+# Check if array contains the given value.
+# Arguments:
+#   $1 - the name of the array
+#   $2 - the value to search for
+# Outputs:
+#   None.
+# Returns:
+#   0 if the element is in the array.
+#   1 if the element is not in the array.
+#   2 if $1 doesn't name an array.
+#######################################
 acontains?() {
+  array? "$1" || return 2
   local -n __array_utils__acontains_array="$1"
   local -r __array_utils__acontains_element="$2"
   for __array_utils__acontains_i in "${__array_utils__acontains_array[@]}"; do

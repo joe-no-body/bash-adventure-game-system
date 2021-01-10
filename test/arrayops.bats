@@ -37,6 +37,7 @@ setup() {
   declare -t tarray=(a b c)
   declare -u uarray=(a b c)
   declare -x xarray=(a b c)
+  declare -a narray
 
   run array? iarray
   assert_success
@@ -49,6 +50,8 @@ setup() {
   run array? uarray
   assert_success
   run array? xarray
+  assert_success
+  run array? narray
   assert_success
 }
 
