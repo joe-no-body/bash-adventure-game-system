@@ -13,7 +13,7 @@ BAGS_LIB_DIR="$(dirname "${BASH_SOURCE[0]}")"
 \unalias -a
 hash -r
 
-# safer IFS, though it shouldn't matter if we're safe
+# safer IFS, though it shouldn't matter if we're digilent with quotes
 IFS=$' \t\n'
 
 source arrayops.bash
