@@ -5,18 +5,20 @@ set -o nounset
 set -o pipefail
 set -o noglob
 
+BAGS_LIB_DIR="$(dirname "${BASH_SOURCE[0]}")"
+
 # ensure namespace isn't polluted
-\export PATH=''
+# passing the lib directory here allows us to source using relative paths
+\export PATH="$BAGS_LIB_DIR"
 \unalias -a
 hash -r
 
 # safer IFS, though it shouldn't matter if we're safe
 IFS=$' \t\n'
 
-# FIXME: use BASH_SOURCE here
-source lib/parse.bash
-source lib/perform.bash
-source lib/utils.bash
+source parse.bash
+source perform.bash
+source utils.bash
 
 bags::main() {
   local verb= dobject= iobject= error=
