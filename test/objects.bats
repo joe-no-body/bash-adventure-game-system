@@ -1,5 +1,6 @@
 load '../node_modules/bats-support/load'
 load '../node_modules/bats-assert/load'
+load '../lib/arrayops.bash'
 
 setup() {
   PATH="lib/:$PATH"
@@ -10,6 +11,17 @@ setup() {
     set-attr location 'room::kitchen'
   }
   init-object object::red-pen
+
+  object::small-box() {
+    set-attr display_name 'small box'
+    set-attr location 'room::kitchen'
+  }
+  init-object object::small-box
+
+  room::kitchen() {
+    set-attr display_name 'kitchen'
+  }
+  init-object room::kitchen
 }
 
 assert_internal_error() {
@@ -97,7 +109,7 @@ assert_internal_error() {
 }
 
 
-### set-flag, flag?, clear-flag
+### flags
 
 @test "set-flag sets flags, clear-flags clears flags, and flag? checks them" {
   # flag? returns false if flag was never set
@@ -129,4 +141,58 @@ assert_internal_error() {
 @test "clear-flag produces an error if given a non-existent object" {
   run clear-flag object::nonexistent takeable
   assert_internal_error
+}
+
+
+### containment
+
+## in?
+
+@test "in? checks an object's location" {
+  assert in? object::red-pen room::kitchen
+  refute in? object::red-pen object::small-box
+}
+
+@test "in? errors on a non-existent object" {
+  run in? object::red-pen object::nonexistent
+  assert_internal_error
+
+  run in? object::nonexistent room::kitchen
+  assert_internal_error
+}
+
+## move
+
+@test "move moves an object to a new location" {
+  move object::red-pen object::small-box
+  assert in? object::red-pen object::small-box
+  refute in? object::red-pen room::kitchen
+
+  local -a box_contents
+  get-contents object::small-box box_contents
+  assert [ "$(alen box_contents)" == 1 ]
+  assert [ "$(aref box_contents 0)" == object::red-pen ]
+
+  local -a kitchen_contents
+  get-contents room::kitchen kitchen_contents
+  assert [ "$(alen kitchen_contents)" == 1 ]
+  assert [ "$(aref kitchen_contents 0)" == object::small-box ]
+}
+
+@test "remove moves an object to the ether" {
+  remove object::red-pen
+  refute in? object::red-pen object::small-box
+  refute in? object::red-pen room::kitchen
+  assert [ "${OBJECT_ATTRS[object::red-pen/location]}" == '' ]
+}
+
+## get-contents
+
+@test "get-contents gets the contents of an object" {
+  local -a kitchen_contents
+  get-contents room::kitchen kitchen_contents
+
+  assert [ "$(alen kitchen_contents)" == 2 ]
+  assert acontains? kitchen_contents object::red-pen
+  assert acontains? kitchen_contents object::small-box
 }

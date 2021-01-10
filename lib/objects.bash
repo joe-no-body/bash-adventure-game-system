@@ -171,3 +171,51 @@ clear-flag() {
 
   OBJECT_ATTRS["$object/flags/$flag"]=
 }
+
+#######################################
+# Check an object's location.
+#######################################
+in?() {
+  object? "$1" || internal_error "$FUNCNAME can't check the location of nonexistent object '$1'"
+  object? "$2" || internal_error "$FUNCNAME can't check the location of nonexistent object '$2'"
+  [[ "${OBJECT_ATTRS["$1/location"]}" == "$2" ]]
+}
+
+#######################################
+# Move object to location.
+#######################################
+move() {
+  object? "$1" || internal_error "$FUNCNAME can't move nonexistent object '$1'"
+  object? "$2" || internal_error "$FUNCNAME can't move to nonexistent object '$2'"
+
+  OBJECT_ATTRS["$1/location"]="$2"
+}
+
+#######################################
+# Move object to the ether (i.e. it still exists, but is located nowhere and
+# cannot be interacted with.)
+#######################################
+remove() {
+  object? "$1" || internal_error "$FUNCNAME can't remove nonexistent object '$1'"
+
+  OBJECT_ATTRS["$1/location"]=
+}
+
+#######################################
+# Get the contents of the object.
+#######################################
+get-contents() {
+  # usage: get-contents room::kitchen kitchen_contents
+  object? "$1" || internal_error "$FUNCNAME can't get the contents of nonexistent object '$1'"
+  array? "$2" || internal_error "$FUNCNAME requires the name of an array as its second argument but got '$2' instead - $(declare -p "$2")"
+
+  local -r __contents_of="$1"
+  local -n __contents_array="$2"
+  __contents_array=()
+
+  for attr in "${!OBJECT_ATTRS[@]}"; do
+    if [[ "$attr" == */location ]] && [[ "${OBJECT_ATTRS["$attr"]}" == "$__contents_of" ]]; then
+      __contents_array+=("${attr%/location}")
+    fi
+  done
+}
