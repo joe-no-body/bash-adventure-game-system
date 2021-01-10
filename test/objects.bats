@@ -8,7 +8,6 @@ setup() {
   object::red-pen() {
     set-attr display_name 'red pen'
     set-attr location 'room::kitchen'
-    # set-flag takeable
   }
   init-object object::red-pen
 }
@@ -94,5 +93,40 @@ assert_internal_error() {
 
 @test "set-attr produces an error if given a non-existent object" {
   run set-attr object::nonexistent foo 'value of foo'
+  assert_internal_error
+}
+
+
+### set-flag, flag?, clear-flag
+
+@test "set-flag sets flags, clear-flags clears flags, and flag? checks them" {
+  # flag? returns false if flag was never set
+  refute flag? object::red-pen takeable
+
+  # flag? returns true once a flag has been set
+  set-flag object::red-pen takeable
+
+  assert flag? object::red-pen takeable
+  assert [ "${OBJECT_ATTRS[object::red-pen/flags/takeable]}" == 1 ]
+
+  # flag? once more returns false if a flag has been cleared
+  clear-flag object::red-pen takeable
+
+  assert [ "${OBJECT_ATTRS[object::red-pen/flags/takeable]}" == '' ]
+  refute flag? object::red-pen takeable
+}
+
+@test "set-flag produces an error if given a non-existent object" {
+  run set-flag object::nonexistent takeable
+  assert_internal_error
+}
+
+@test "flag? produces an error if given a non-existent object" {
+  run flag? object::nonexistent takeable
+  assert_internal_error
+}
+
+@test "clear-flag produces an error if given a non-existent object" {
+  run clear-flag object::nonexistent takeable
   assert_internal_error
 }

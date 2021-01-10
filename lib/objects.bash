@@ -57,7 +57,7 @@ set-attr() {
   if (( "$#" == 2 )); then
     # usage: set-attr ATTR VAL
     if [[ ! -v INITIALIZING_OBJECT ]]; then
-      internal_error "$0 requires three arguments if it's not called from init-object"
+      internal_error "$FUNCNAME requires three arguments if it's not called from init-object"
     fi
     object="$INITIALIZING_OBJECT"
   elif (( "$#" == 3 )); then
@@ -65,7 +65,7 @@ set-attr() {
     object="$1"
     shift
   else
-    internal_error "$0 expects two or three arguments, but got $#"
+    internal_error "$FUNCNAME expects two or three arguments, but got $#"
   fi
 
   if ! object? "$object"; then
@@ -94,7 +94,7 @@ get-attr() {
   object="$1"
   attr="$2"
 
-  object? "$object" || internal_error "$0 can't get attributes on non-existent objects - got $1"
+  object? "$object" || internal_error "$FUNCNAME can't get attributes on non-existent objects - got $1"
 
   echo "${OBJECT_ATTRS["$object/$attr"]}"
 }
@@ -112,23 +112,62 @@ get-attr() {
 #   0 if the attribute exists, 1
 #######################################
 has-attr?() {
-  object? "$1" || internal_error "$0 can't check the presence of attributes on non-existent objects - got $1"
+  object? "$1" || internal_error "$FUNCNAME can't check the presence of attributes on non-existent objects - got $1"
   [[ -v OBJECT_ATTRS["$1/$2"] ]]
 }
 
+#######################################
+# Set the given flag for the object.
+#######################################
 set-flag() {
   local object flag
   if (( "$#" == 1 )); then
     if [[ ! -v INITIALIZING_OBJECT ]]; then
-      internal_error "$0 requires three arguments if it's not called from init-object"
+      internal_error "$FUNCNAME requires two arguments if it's not called from init-object"
     fi
     object="$INITIALIZING_OBJECT"
-  elif (( "$#" == 3 )); then
+  elif (( "$#" == 2 )); then
     object="$1"
     shift
   else
-    internal_error "$0 expects two or three arguments, but got $#"
+    internal_error "$FUNCNAME expects one or two arguments, but got $#"
   fi
 
+  object? "$object" || internal_error "$FUNCNAME can't set flags on non-existent objects - got $1"
 
+  flag="$1"
+
+  OBJECT_ATTRS["$object/flags/$flag"]=1
+}
+
+#######################################
+# Check if the given flag is set.
+#######################################
+flag?() {
+  object? "$1" || internal_error "$FUNCNAME can't check the presence of flags on non-existent objects - got $1"
+  [[ -v OBJECT_ATTRS["$1/flags/$2"] ]] && [[ "${OBJECT_ATTRS["$1/flags/$2"]}" != '' ]]
+}
+
+#######################################
+# Clear the given flag for the object.
+#######################################
+clear-flag() {
+  local object flag
+  if (( "$#" == 1 )); then
+    if [[ ! -v INITIALIZING_OBJECT ]]; then
+      internal_error "$FUNCNAME requires two arguments if it's not called from init-object"
+    fi
+    object="$INITIALIZING_OBJECT"
+  elif (( "$#" == 2 )); then
+    object="$1"
+    shift
+  else
+    internal_error "$FUNCNAME expects one or two arguments, but got $#"
+  fi
+
+  object? "$object" || internal_error "$FUNCNAME can't get flags on non-existent objects - got $1"
+
+  flag="$1"
+
+  OBJECT_ATTRS["$object/flags/$flag"]=
 }
