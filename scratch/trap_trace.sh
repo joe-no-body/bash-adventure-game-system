@@ -11,8 +11,10 @@ trim_string() {
 trace() {
   local line_num func file i
   local -a line
-  for ((i=1;;i++)); do
+  i="${1:-1}"
+  while true; do
     caller $i || break
+    ((i++))
   done | while read -r line_num func file; do
     mapfile -t -s "$((line_num - 1))" -n 1 line <"$file"
     echo -e "$file, line $line_num: $(trim_string "$line")"
