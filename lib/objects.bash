@@ -24,6 +24,17 @@ init-object() {
 }
 
 #######################################
+# Check if an object exists.
+# Globals:
+#   OBJECT_ATTRS
+# Arguments:
+#   The ID of the object to check.
+#######################################
+object?() {
+  [[ -v OBJECT_ATTRS["$1/_type"] ]]
+}
+
+#######################################
 # Set an attribute on an object.
 # Globals:
 #   OBJECT_ATTRS
@@ -57,7 +68,7 @@ set-attr() {
     internal_error "$0 expects two or three arguments, but got $#"
   fi
 
-  if [[ ! -v OBJECT_ATTRS["$object/_type"] ]]; then
+  if ! object? "$object"; then
     internal_error "uninitialized object '$object'"
   fi
 
@@ -79,11 +90,11 @@ set-attr() {
 #######################################
 get-attr() {
   local object attr
+  # TODO: validate args
   object="$1"
   attr="$2"
 
-  # TODO: validate args
-  # TODO: error if object or attr does not exist
+  object? "$object" || internal_error "$0 can't get attributes on non-existent objects - got $1"
 
   echo "${OBJECT_ATTRS["$object/$attr"]}"
 }
@@ -101,7 +112,7 @@ get-attr() {
 #   0 if the attribute exists, 1
 #######################################
 has-attr?() {
-  [[ -v OBJECT_ATTRS["$1/_type"] ]] || return 2
+  object? "$1" || internal_error "$0 can't check the presence of attributes on non-existent objects - got $1"
   [[ -v OBJECT_ATTRS["$1/$2"] ]]
 }
 

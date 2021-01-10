@@ -32,6 +32,14 @@ assert_internal_error() {
 }
 
 
+### object?
+
+@test "object? checks if an object is defined" {
+  assert object? object::red-pen
+  refute object? object::nonexistent
+}
+
+
 ### get-attr
 
 @test "get-attr gets an object's attributes"  {
@@ -44,6 +52,11 @@ assert_internal_error() {
   assert_output 'room::kitchen'
 }
 
+@test "get-attr produces an error if given a non-existent object" {
+  run get-attr object::nonexistent foo
+  assert_internal_error
+}
+
 
 ### has-attr?
 
@@ -53,6 +66,11 @@ assert_internal_error() {
 
   run has-attr? object::red-pen foobar
   assert_failure
+}
+
+@test "has-attr? produces an error if given a non-existent object" {
+  run has-attr? object::nonexistent foo
+  assert_internal_error
 }
 
 
