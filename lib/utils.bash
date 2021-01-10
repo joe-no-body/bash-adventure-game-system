@@ -1,11 +1,14 @@
 readonly STATUS_INTERNAL_ERROR=2
 
+#######################################
+# Return 0 if $1 is a function or non-zero if it isn't.
+#######################################
 func?() {
   declare -F "$1" &>/dev/null
 }
 
 #######################################
-# Trim leadingand trailing spaces from a string.
+# Trim leading and trailing spaces from a string.
 # Via https://github.com/dylanaraps/pure-bash-bible
 # See LICENSE for terms.
 # Arguments:
@@ -21,7 +24,7 @@ trim_string() {
 }
 
 #######################################
-# Produce a stack trace.
+# Print a stack trace.
 # Arguments:
 #   $1 (optional) - Number of stack frames to skip in the output.
 # Output:
@@ -37,16 +40,24 @@ trace() {
     ((i++))
   done | while read -r line_num func file; do
     mapfile -t -s "$((line_num - 1))" -n 1 line <"$file"
-    echo -e "$file, line $line_num: $(trim_string "$line")"
+    printf '%s, line %s: %s\n' "$file" "$line_num" "$(trim_string "$line")"
   done
 }
 
+#######################################
+# Print an error message and stack trace on stderr, then exit.
+#######################################
 internal_error() {
   echo "internal error: $*"
   trace 1
   exit "$STATUS_INTERNAL_ERROR"
 } >&2
 
+#######################################
+# Print a debug message on stderr.
+# Globals:
+#   BAGS_DEBUG_MODE - if non-empty, the message will be printed
+#######################################
 debug() {
   if [[ "$BAGS_DEBUG_MODE" ]]; then
     echo "debug: $*"
