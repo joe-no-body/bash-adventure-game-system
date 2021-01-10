@@ -19,22 +19,22 @@ assert_internal_error() {
 }
 
 
-### objects::init-object
+### init-object
 
-@test "objects::init-object sets up object sentinel value" {
-  assert [ "${object_attrs[object::red-pen/_type]}" == 'object' ]
+@test "init-object sets up object sentinel value" {
+  assert [ "${OBJECT_ATTRS[object::red-pen/_type]}" == 'object' ]
 }
 
-@test "objects::init-object produces an error if given a non-function" {
+@test "init-object produces an error if given a non-function" {
   run init-object object::does-not-exist
   assert_internal_error
-  assert [ ! -v object_attrs[object::does-not-exist] ]
+  assert [ ! -v OBJECT_ATTRS[object::does-not-exist] ]
 }
 
 
-### objects::get-attr
+### get-attr
 
-@test "objects::get-attr gets an object's attributes"  {
+@test "get-attr gets an object's attributes"  {
   run get-attr object::red-pen display_name
   assert_success
   assert_output 'red pen'
@@ -45,25 +45,36 @@ assert_internal_error() {
 }
 
 
-### objects::set-attr
+### has-attr?
 
-@test "objects::set-attr sets attributes" {
+@test "has-attr? validates an attribute's presence" {
+  run has-attr? object::red-pen display_name
+  assert_success
+
+  run has-attr? object::red-pen foobar
+  assert_failure
+}
+
+
+### set-attr
+
+@test "set-attr sets attributes" {
   set-attr object::red-pen foo 'value of foo'
 
-  assert [ -v object_attrs[object::red-pen/foo] ]
-  assert [ "${object_attrs[object::red-pen/foo]}" == "value of foo" ]
+  assert [ -v OBJECT_ATTRS[object::red-pen/foo] ]
+  assert [ "${OBJECT_ATTRS[object::red-pen/foo]}" == "value of foo" ]
 
   run get-attr object::red-pen foo
   assert_success
   assert_output 'value of foo'
 }
 
-@test "objects::set-attr produces an error if too few args are given" {
+@test "set-attr produces an error if too few args are given" {
   run set-attr
   assert_internal_error
 }
 
-@test "objects::set-attr produces an error if given a non-existent object" {
+@test "set-attr produces an error if given a non-existent object" {
   run set-attr object::nonexistent foo 'value of foo'
   assert_internal_error
 }
