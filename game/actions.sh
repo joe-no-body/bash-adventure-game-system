@@ -6,7 +6,7 @@ verb::look() {
       echo "You look at the $dobject"
     fi
   else
-    echo "$(location long_description)"
+    echo "$(get-attr "$location" long_description)"
   fi
 }
 
@@ -24,10 +24,12 @@ verb::go() {
     return
   fi
 
-  if ! destination="$(location "$direction")"; then
+  if ! has-attr? "$location" "$direction"; then
     echo "I'm afraid you can't go $direction from here."
     return
   fi
+
+  destination="$(get-attr "$location" "$direction")"
 
   case "$destination" in
     sorry@*)
@@ -37,9 +39,9 @@ verb::go() {
   esac
 
   location="$destination"
-  echo "$(location name)"
-  if ! location visited; then
-    echo "$(location long_description)"
+  echo "$(get-attr "$location" name)"
+  if ! flag? "$location" visited; then
+    echo "$(get-attr "$location" long_description)"
   fi
-  set_location visited 1
+  set-flag "$location" visited
 }

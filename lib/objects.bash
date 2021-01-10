@@ -3,6 +3,20 @@ source utils.bash
 declare -gA OBJECT_ATTRS
 
 #######################################
+# Initialize objects
+#######################################
+init-all-objects() {
+  local func
+  while read -r func; do
+    func="${func#declare -f }"
+    case "$func" in
+      object::*) ;&
+      room::*) init-object "$func" ;;
+    esac
+  done < <(declare -F)
+}
+
+#######################################
 # Initialize an object from its init function.
 # Globals:
 #   OBJECT_ATTRS - the object attributes map
@@ -17,6 +31,7 @@ declare -gA OBJECT_ATTRS
 #   0 on success, non-zero on error.
 #######################################
 init-object() {
+  debug "Initializing object $func"
   func? "$1" || internal_error "init-object expects a function, but got '$1'"
   local -r INITIALIZING_OBJECT="$1"
   OBJECT_ATTRS["$1/_type"]=object

@@ -1,3 +1,6 @@
+if [[ ! -v ARRAYOPS_BASH_ ]]; then
+ARRAYOPS_BASH=1
+
 # arrayops.bash --- hide some of the nasty syntax for manipulating bash arrays
 # via https://github.com/bminor/bash/blob/master/examples/functions/arrayops.bash
 # Author: Noah Friedman <friedman@splode.com>
@@ -227,3 +230,5 @@ acontains?() {
   done
   return 1
 }
+
+fi

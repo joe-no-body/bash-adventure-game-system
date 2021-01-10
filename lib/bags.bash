@@ -16,11 +16,19 @@ hash -r
 # safer IFS, though it shouldn't matter if we're safe
 IFS=$' \t\n'
 
+source arrayops.bash
 source parse.bash
 source perform.bash
 source utils.bash
+source objects.bash
 
 bags::main() {
+  init-all-objects
+
+  if [[ "${BAGS_DEBUG_MODE:-}" ]]; then
+    debug "Declared object attributes: $(declare -p OBJECT_ATTRS)"
+  fi
+
   local verb= dobject= iobject= error=
   local -a response
 
