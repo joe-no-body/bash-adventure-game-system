@@ -1,3 +1,5 @@
+readonly STATUS_INTERNAL_ERROR=2
+
 func?() {
   declare -F "$1" &>/dev/null
 }
@@ -42,4 +44,11 @@ trace() {
 internal_error() {
   echo "internal error: $*"
   trace 1
+  exit "$STATUS_INTERNAL_ERROR"
+} >&2
+
+debug() {
+  if [[ "$BAGS_DEBUG_MODE" ]]; then
+    echo "debug: $*"
+  fi
 } >&2
