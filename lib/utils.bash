@@ -43,7 +43,7 @@ trace() {
     ((i++))
   done | while read -r line_num func file; do
     mapfile -t -s "$((line_num - 1))" -n 1 line <"$file"
-    printf '  %s, line %s:\n    %s\n' "$file" "$line_num" "$(trim_string "$line")"
+    printf '  %s, line %s, in %s:\n    %s\n' "$file" "$line_num" "$func" "$(trim_string "$line")"
   done
 }
 
@@ -63,8 +63,7 @@ internal_error() {
 #######################################
 debug() {
   if [[ "${BAGS_DEBUG_MODE:-}" ]]; then
-    printf '%s:%s, line %s: %s\n' "${BASH_SOURCE[1]}" "${FUNCNAME[1]}" "${BASH_LINENO[0]}" "$*"
-    # echo "debug: ${BASH_SOURCE[1]}:${FUNCNAME[1]}:line ${BASH_LINENO[0]} $*"
+    printf '%s, line %s, in %s: %s\n' "${BASH_SOURCE[1]}" "${BASH_LINENO[0]}" "${FUNCNAME[1]}" "$*"
   fi
 } >&2
 
