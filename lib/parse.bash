@@ -1,4 +1,5 @@
 # A basic parser for English commands.
+source utils.bash
 
 # The syntax_tree is represented as an associative array of valid prefixes, with
 # full valid sentences structures being denoted by a value referencing a
@@ -82,11 +83,6 @@ syntax_error() {
   return 1
 }
 
-internal_error() {
-  echo "internal error: $*" >&2
-  exit 1
-}
-
 parse() {
   # for each word in the input:
   #   if the prefix + word is in the syntax_tree, continue
@@ -116,24 +112,27 @@ parse() {
       continue
     fi
 
-    # try matching an object
-    if grammatical? "$prefix OBJ"; then
-      if [[ "$dobject" == "" ]]; then
-        dobject="$word"
-        prefix="$prefix OBJ"
-        continue
-      elif [[ "$iobject" == "" ]]; then
-        iobject="$word"
-        prefix="$prefix OBJ"
-        continue
-      else
-        syntax_error "unexpected object in pattern '$prefix OBJ'"
-        return 1
-      fi
+    # make sure an object's noun phrase can go here
+    if ! grammatical? "$prefix OBJ"; then
+      # failed to match a literal or an object -> error
+      syntax_error "I can't make sense of '$word' at the end of '$raw_prefix'"
+      return 1
     fi
 
-    # failed to match a literal or an object -> error
-    syntax_error "I can't make sense of '$word' at the end of '$raw_prefix'"
+    # try matching an object
+    if [[ "$dobject" == "" ]]; then
+      dobject="$word"
+      prefix="$prefix OBJ"
+      continue
+    fi
+
+    if [[ "$iobject" == "" ]]; then
+      iobject="$word"
+      prefix="$prefix OBJ"
+      continue
+    fi
+
+    internal_error "the syntax '$prefix OBJ' has too many objects defined or the parser state has gotten borked. dobject and iobject are already defined, but the defined syntax wants another object. (dobject='$dobject', iobject='$iobject')"
     return 1
   done
 
