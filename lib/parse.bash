@@ -1,10 +1,10 @@
-# My second attempt at a rudimentary syntax tree-type thing in Bash.
+# A basic parser for English commands.
 
-# The tree is represented as an associative array of valid prefixes, with full
-# valid sentences structures being denoted by a value referencing a
-# corresponding verb function. An example tree is illustrated by the comments
-# below.
-declare -A tree=(
+# The syntax_tree is represented as an associative array of valid prefixes, with
+# full valid sentences structures being denoted by a value referencing a
+# corresponding verb function. An example syntax_tree is illustrated by the
+# comments below.
+declare -A syntax_tree=(
   # [yell]=verb::yell
 
   # [go]=
@@ -51,19 +51,19 @@ syntax() {
   for word in "${syntax[@]}"; do
     prefix+=("$word")
     prefix_str="${prefix[*]}"
-    if [[ "${tree["$prefix_str"]+exists}" == '' ]]; then
-      tree["$prefix_str"]=''
+    if [[ "${syntax_tree["$prefix_str"]+exists}" == '' ]]; then
+      syntax_tree["$prefix_str"]=''
     fi
   done
-  tree["$prefix_str"]="$verb_func"
+  syntax_tree["$prefix_str"]="$verb_func"
 }
 
 grammatical?() {
-  [[ -v tree["$1"] ]]
+  [[ -v syntax_tree["$1"] ]]
 }
 
 complete?() {
-  [[ -v tree["$1"] ]] && [[ "${tree["$1"]}" != "" ]]
+  [[ -v syntax_tree["$1"] ]] && [[ "${syntax_tree["$1"]}" != "" ]]
 }
 
 get-verb() {
@@ -74,7 +74,7 @@ get-verb() {
     internal_error "get-verb got an incomplete sentence: '$prefix'"
   fi
 
-  echo "${tree["$prefix"]}"
+  echo "${syntax_tree["$prefix"]}"
 }
 
 syntax_error() {
@@ -89,10 +89,10 @@ internal_error() {
 
 parse() {
   # for each word in the input:
-  #   if the prefix + word is in the tree, continue
-  #   if the prefix + "OBJ" is in the tree, parse an object and continue
+  #   if the prefix + word is in the syntax_tree, continue
+  #   if the prefix + "OBJ" is in the syntax_tree, parse an object and continue
   #   error
-  # if tree[prefix] is null, error
+  # if syntax_tree[prefix] is null, error
   # otherwise, return successfully
   verb= dobject= iobject=
   # -l ensures that word will always be converted to lower case for consistency
