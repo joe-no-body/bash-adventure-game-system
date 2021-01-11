@@ -1,8 +1,27 @@
 load '../node_modules/bats-support/load'
 load '../node_modules/bats-assert/load'
 
+setup() {
+  PATH="lib/:$PATH"
+  source lib/parse.bash
+
+  syntax yell = verb::yell
+
+  syntax look = verb::look
+  syntax look OBJ = verb::look
+  syntax look in OBJ = verb::look-inside
+  syntax look at OBJ = verb::look
+
+  syntax go OBJ = verb::go
+
+  syntax take OBJ = verb::take
+  syntax take the OBJ = verb::take
+
+  syntax attack OBJ with OBJ = verb::attack
+}
+
 @test "parse standalone verb 'look'" {
-  run bash lib/parse.bash look
+  run parse::main look
   assert_success
   assert_output --partial "verb=verb::look"
   assert_output --partial "dobject="
@@ -10,7 +29,7 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "parse standalone verb 'yell'" {
-  run bash lib/parse.bash yell
+  run parse::main yell
   assert_success
   assert_output --partial "verb=verb::yell"
   assert_output --partial "dobject="
@@ -18,7 +37,7 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "parse 'go north'" {
-  run bash lib/parse.bash go north
+  run parse::main go north
   assert_success
   assert_output --partial "verb=verb::go"
   assert_output --partial "dobject=north"
@@ -26,7 +45,7 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "parse 'take stick'" {
-  run bash lib/parse.bash take stick
+  run parse::main take stick
   assert_success
   assert_output --partial "verb=verb::take"
   assert_output --partial "dobject=stick"
@@ -34,7 +53,7 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "parse 'take the stick'" {
-  run bash lib/parse.bash take the stick
+  run parse::main take the stick
   assert_success
   assert_output --partial "verb=verb::take"
   assert_output --partial "dobject=stick"
@@ -42,7 +61,7 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "parse 'attack troll with sword'" {
-  run bash lib/parse.bash attack troll with sword
+  run parse::main attack troll with sword
   assert_success
   assert_output --partial "verb=verb::attack"
   assert_output --partial "dobject=troll"
@@ -50,13 +69,13 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "throw parse error if first word isn't a verb" {
-  run bash lib/parse.bash the
+  run parse::main the
   assert_failure
   assert_output --partial "syntax error"
 }
 
 @test "throw a useful error if input terminates unexpectedly" {
-  run bash lib/parse.bash attack
+  run parse::main attack
   assert_failure
   assert_output --partial "syntax error"
 }

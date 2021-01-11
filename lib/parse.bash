@@ -4,7 +4,7 @@
 # full valid sentences structures being denoted by a value referencing a
 # corresponding verb function. An example syntax_tree is illustrated by the
 # comments below.
-declare -A syntax_tree=(
+declare -gA syntax_tree=(
   # [yell]=verb::yell
 
   # [go]=
@@ -145,22 +145,9 @@ parse() {
   verb="$(get-verb "$prefix")"
 }
 
-if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+parse::main() {
   error=
   set -euo pipefail
-  syntax yell = verb::yell
-
-  syntax look = verb::look
-  syntax look OBJ = verb::look
-  syntax look in OBJ = verb::look-inside
-  syntax look at OBJ = verb::look
-
-  syntax go OBJ = verb::go
-
-  syntax take OBJ = verb::take
-  syntax take the OBJ = verb::take
-
-  syntax attack OBJ with OBJ = verb::attack
 
   verb= dobject= iobject=
   if ! parse "$@" || [[ "$error" ]]; then
@@ -168,4 +155,8 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     exit 1
   fi
   echo "verb=$verb dobject=$dobject iobject=$iobject"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  parse::main "$@"
 fi
