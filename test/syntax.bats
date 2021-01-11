@@ -1,15 +1,18 @@
 load '../node_modules/bats-support/load'
 load '../node_modules/bats-assert/load'
 
-@test "syntax - foo" {
+setup() {
+  PATH="lib/:$PATH"
   source lib/parse.bash
+}
+
+@test "syntax - foo" {
   syntax foo = verb::foo
 
   assert [ "${syntax_tree[foo]}" == verb::foo ]
 }
 
 @test "syntax - foo OBJ" {
-  source lib/parse.bash
   syntax foo OBJ = verb::foo
 
   assert [ "${syntax_tree[foo]}" == '' ]
@@ -17,7 +20,6 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "syntax - foo OBJ bar OBJ" {
-  source lib/parse.bash
   syntax foo OBJ bar OBJ = verb::foo-bar
 
   assert [ "${syntax_tree[foo]}" == '' ]
@@ -27,7 +29,6 @@ load '../node_modules/bats-assert/load'
 }
 
 @test "syntax - overlapping syntaxes" {
-  source lib/parse.bash
   syntax foo OBJ bar OBJ = verb::foo-bar
   syntax foo OBJ = verb::foo
   syntax foo = verb::foo-nothing
