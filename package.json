@@ -9,7 +9,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "bats test"
+    "test": "bats test",
+    "lint": "shellcheck lib/*.bash"
   },
   "author": "joe-no-body",
   "license": "AGPL-3.0-or-later",
