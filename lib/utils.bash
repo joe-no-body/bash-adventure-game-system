@@ -43,7 +43,7 @@ trace() {
     ((i++))
   done | while read -r line_num func file; do
     mapfile -t -s "$((line_num - 1))" -n 1 line <"$file"
-    printf '  %s, line %s, in %s:\n    %s\n' "$file" "$line_num" "$func" "$(trim_string "$line")"
+    printf '  %s, line %s, in %s:\n    %s\n' "$file" "$line_num" "$func" "$(trim_string "${line[0]}")"
   done
 }
 

@@ -1,5 +1,5 @@
 if [[ ! -v ARRAYOPS_BASH_ ]]; then
-ARRAYOPS_BASH=1
+ARRAYOPS_BASH_=1
 
 # arrayops.bash --- hide some of the nasty syntax for manipulating bash arrays
 # via https://github.com/bminor/bash/blob/master/examples/functions/arrayops.bash
@@ -112,7 +112,7 @@ aref()
 {
     eval local "v=(\"\${$1[@]}\")"
     local x
-    for x in ${@:2} ; do echo "${v[$x]}"; done
+    for x in "${@:2}" ; do echo "${v[$x]}"; done
 }
 
 #:docstring aref:
@@ -138,11 +138,11 @@ alen()
 #:end docstring:
 anreverse()
 {
-    eval set $1 "\"\${$1[@]}\""
-    eval unset $1
+    eval set "$1" "\"\${$1[@]}\""
+    eval unset "$1"
     while [ $# -gt 1 ]; do
         eval "$1=(\"$2\" \"\${$1[@]}\")"
-        set $1 "${@:3}"
+        set "$1" "${@:3}"
     done
 }
 

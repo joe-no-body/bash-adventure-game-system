@@ -72,7 +72,7 @@ set-attr() {
   if (( "$#" == 2 )); then
     # usage: set-attr ATTR VAL
     if [[ ! -v INITIALIZING_OBJECT ]]; then
-      internal_error "$FUNCNAME requires three arguments if it's not called from init-object"
+      internal_error "${FUNCNAME[0]} requires three arguments if it's not called from init-object"
     fi
     object="$INITIALIZING_OBJECT"
   elif (( "$#" == 3 )); then
@@ -80,7 +80,7 @@ set-attr() {
     object="$1"
     shift
   else
-    internal_error "$FUNCNAME expects two or three arguments, but got $#"
+    internal_error "${FUNCNAME[0]} expects two or three arguments, but got $#"
   fi
 
   if ! object? "$object"; then
@@ -109,7 +109,7 @@ get-attr() {
   object="$1"
   attr="$2"
 
-  object? "$object" || internal_error "$FUNCNAME can't get attributes on non-existent objects - got $1"
+  object? "$object" || internal_error "${FUNCNAME[0]} can't get attributes on non-existent objects - got $1"
 
   echo "${OBJECT_ATTRS["$object/$attr"]}"
 }
@@ -127,7 +127,7 @@ get-attr() {
 #   0 if the attribute exists, 1
 #######################################
 has-attr?() {
-  object? "$1" || internal_error "$FUNCNAME can't check the presence of attributes on non-existent objects - got $1"
+  object? "$1" || internal_error "${FUNCNAME[0]} can't check the presence of attributes on non-existent objects - got $1"
   [[ -v OBJECT_ATTRS["$1/$2"] ]]
 }
 
@@ -138,17 +138,17 @@ set-flag() {
   local object flag
   if (( "$#" == 1 )); then
     if [[ ! -v INITIALIZING_OBJECT ]]; then
-      internal_error "$FUNCNAME requires two arguments if it's not called from init-object"
+      internal_error "${FUNCNAME[0]} requires two arguments if it's not called from init-object"
     fi
     object="$INITIALIZING_OBJECT"
   elif (( "$#" == 2 )); then
     object="$1"
     shift
   else
-    internal_error "$FUNCNAME expects one or two arguments, but got $#"
+    internal_error "${FUNCNAME[0]} expects one or two arguments, but got $#"
   fi
 
-  object? "$object" || internal_error "$FUNCNAME can't set flags on non-existent objects - got $1"
+  object? "$object" || internal_error "${FUNCNAME[0]} can't set flags on non-existent objects - got $1"
 
   flag="$1"
 
@@ -159,7 +159,7 @@ set-flag() {
 # Check if the given flag is set.
 #######################################
 flag?() {
-  object? "$1" || internal_error "$FUNCNAME can't check the presence of flags on non-existent objects - got $1"
+  object? "$1" || internal_error "${FUNCNAME[0]} can't check the presence of flags on non-existent objects - got $1"
   [[ -v OBJECT_ATTRS["$1/flags/$2"] ]] && [[ "${OBJECT_ATTRS["$1/flags/$2"]}" != '' ]]
 }
 
@@ -170,17 +170,17 @@ clear-flag() {
   local object flag
   if (( "$#" == 1 )); then
     if [[ ! -v INITIALIZING_OBJECT ]]; then
-      internal_error "$FUNCNAME requires two arguments if it's not called from init-object"
+      internal_error "${FUNCNAME[0]} requires two arguments if it's not called from init-object"
     fi
     object="$INITIALIZING_OBJECT"
   elif (( "$#" == 2 )); then
     object="$1"
     shift
   else
-    internal_error "$FUNCNAME expects one or two arguments, but got $#"
+    internal_error "${FUNCNAME[0]} expects one or two arguments, but got $#"
   fi
 
-  object? "$object" || internal_error "$FUNCNAME can't get flags on non-existent objects - got $1"
+  object? "$object" || internal_error "${FUNCNAME[0]} can't get flags on non-existent objects - got $1"
 
   flag="$1"
 
@@ -191,8 +191,8 @@ clear-flag() {
 # Check an object's location.
 #######################################
 in?() {
-  object? "$1" || internal_error "$FUNCNAME can't check the location of nonexistent object '$1'"
-  object? "$2" || internal_error "$FUNCNAME can't check the location of nonexistent object '$2'"
+  object? "$1" || internal_error "${FUNCNAME[0]} can't check the location of nonexistent object '$1'"
+  object? "$2" || internal_error "${FUNCNAME[0]} can't check the location of nonexistent object '$2'"
   [[ "${OBJECT_ATTRS["$1/location"]}" == "$2" ]]
 }
 
@@ -200,8 +200,8 @@ in?() {
 # Move object to location.
 #######################################
 move() {
-  object? "$1" || internal_error "$FUNCNAME can't move nonexistent object '$1'"
-  object? "$2" || internal_error "$FUNCNAME can't move to nonexistent object '$2'"
+  object? "$1" || internal_error "${FUNCNAME[0]} can't move nonexistent object '$1'"
+  object? "$2" || internal_error "${FUNCNAME[0]} can't move to nonexistent object '$2'"
 
   OBJECT_ATTRS["$1/location"]="$2"
 }
@@ -211,7 +211,7 @@ move() {
 # cannot be interacted with.)
 #######################################
 remove() {
-  object? "$1" || internal_error "$FUNCNAME can't remove nonexistent object '$1'"
+  object? "$1" || internal_error "${FUNCNAME[0]} can't remove nonexistent object '$1'"
 
   OBJECT_ATTRS["$1/location"]=
 }
@@ -221,8 +221,8 @@ remove() {
 #######################################
 get-contents() {
   # usage: get-contents room::kitchen kitchen_contents
-  object? "$1" || internal_error "$FUNCNAME can't get the contents of nonexistent object '$1'"
-  array? "$2" || internal_error "$FUNCNAME requires the name of an array as its second argument but got '$2' instead - $(declare -p "$2")"
+  object? "$1" || internal_error "${FUNCNAME[0]} can't get the contents of nonexistent object '$1'"
+  array? "$2" || internal_error "${FUNCNAME[0]} requires the name of an array as its second argument but got '$2' instead - $(declare -p "$2")"
 
   local -r __contents_of="$1"
   local -n __contents_array="$2"

@@ -90,7 +90,9 @@ parse() {
   #   error
   # if syntax_tree[prefix] is null, error
   # otherwise, return successfully
-  verb= dobject= iobject=
+  verb=
+  dobject=
+  iobject=
   # -l ensures that word will always be converted to lower case for consistency
   local -l word
   word="$1"
@@ -148,7 +150,9 @@ parse::main() {
   error=
   set -euo pipefail
 
-  verb= dobject= iobject=
+  verb=
+  dobject=
+  iobject=
   if ! parse "$@" || [[ "$error" ]]; then
     echo "syntax error: $error" >&2
     exit 1

@@ -29,7 +29,10 @@ bags::main() {
     debug "Declared object attributes: $(declare -p OBJECT_ATTRS)"
   fi
 
-  local verb= dobject= iobject= error=
+  local verb=
+  local dobject=
+  local iobject=
+  local error=
   local -a response
 
   while true; do
