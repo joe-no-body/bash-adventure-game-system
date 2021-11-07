@@ -41,6 +41,10 @@ bags::main() {
       exit 1
     fi
 
+    if [[ "${response[*]}" == "" ]]; then
+      continue
+    fi
+
     if [[ "${response[0]}" == "quit" ]]; then
       break
     fi
