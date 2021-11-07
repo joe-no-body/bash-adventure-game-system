@@ -39,9 +39,9 @@ verb::go() {
   esac
 
   location="$destination"
-  echo "$(get-attr "$location" name)"
+  get-attr "$location" name
   if ! flag? "$location" visited; then
-    echo "$(get-attr "$location" long_description)"
+    get-attr "$location" long_description
   fi
   set-flag "$location" visited
 }
