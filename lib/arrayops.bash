@@ -97,7 +97,7 @@ ashift()
 #:end docstring:
 aset()
 {
-    eval "$1[\$2]=${@:3}"
+    eval "$1[\$2]=${*:3}"
 }
 
 #:docstring aref:
@@ -112,6 +112,10 @@ aref()
 {
     eval local "v=(\"\${$1[@]}\")"
     local x
+
+    # shellcheck disable=SC2154
+    # `v` is declared above but shellcheck thinks it isn't because of the weird
+    # eval hack
     for x in "${@:2}" ; do echo "${v[$x]}"; done
 }
 
