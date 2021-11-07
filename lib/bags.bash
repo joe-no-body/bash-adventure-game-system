@@ -1,21 +1,30 @@
 #!/usr/bin/env bash
 
+# start preamble
+
+# set stricter error handling
 set -o errexit
 set -o nounset
 set -o pipefail
-set -o noglob
 
-BAGS_LIB_DIR="$(dirname "${BASH_SOURCE[0]}")"
-
-# ensure namespace isn't polluted
-# passing the lib directory here allows us to source using relative paths
-\export PATH="$BAGS_LIB_DIR"
-\unalias -a
-hash -r
-
-# safer IFS, though it shouldn't matter if we're digilent with quotes
+# set a safer IFS, though it shouldn't matter if we're digilent with quotes
 IFS=$' \t\n'
 
+# enable function names with special characters like `?`
+set -o noglob
+
+if [[ ! -v BAGS_LIB_DIR ]]; then
+  BAGS_LIB_DIR="$(dirname "${BASH_SOURCE[0]}")"
+fi
+
+# ensure the namespace is unpolluted
+\export PATH="$BAGS_LIB_DIR"  # purge the path of everything but the BAGS source
+\unalias -a                   # clear any aliases the user might have set
+hash -r                       # purge the command hash table
+
+# end preamble
+
+# now we load all of our libraries
 source arrayops.bash
 source parse.bash
 source perform.bash
@@ -29,12 +38,14 @@ bags::main() {
     debug "Declared object attributes: $(declare -p OBJECT_ATTRS)"
   fi
 
+  # init shared variables
   local verb=
   local dobject=
   local iobject=
   local error=
   local -a response
 
+  # main loop
   while true; do
     if ! read -rep "> " -a response; then
       echo "error"
