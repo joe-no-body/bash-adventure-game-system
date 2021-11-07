@@ -104,7 +104,7 @@ parse() {
   shift
 
   if ! grammatical? "$prefix"; then
-    syntax_error "invalid sentence start '$prefix'"
+    syntax_error "I don't know how to $prefix"
     return 1
   fi
 
