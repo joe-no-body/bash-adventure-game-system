@@ -36,6 +36,8 @@ syntax() {
   local -a syntax
   local word verb_func
 
+  # TODO: validate that no more than two objects are defined
+
   while (( "$#" )); do
     word="$1"
     shift
