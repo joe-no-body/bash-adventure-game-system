@@ -28,6 +28,14 @@ setup() {
   assert_output --partial "iobject="
 }
 
+@test "parse 'look in box'" {
+  run parse::main look in box
+  assert_success
+  assert_output --partial "verb=verb::look-inside"
+  assert_output --partial "dobject=box"
+  assert_output --partial "iobject="
+}
+
 @test "parse standalone verb 'yell'" {
   run parse::main yell
   assert_success
