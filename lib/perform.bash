@@ -1,3 +1,5 @@
+# perform executes the action handler for the parsed verb, direct object, and
+# indirect object.
 perform() {
   local verb="$1" dobject="$2" iobject="$3"
   func? "$verb" || {

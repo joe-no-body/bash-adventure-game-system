@@ -67,14 +67,17 @@ syntax() {
   syntax_tree["$prefix_str"]="$verb_func"
 }
 
+# grammatical? tests if the given string is in syntax_tree.
 grammatical?() {
   [[ -v syntax_tree["$1"] ]]
 }
 
+# complete? tests if the given string is in syntax_tree and refers to a verb.
 complete?() {
   [[ -v syntax_tree["$1"] ]] && [[ "${syntax_tree["$1"]}" != "" ]]
 }
 
+# get-verb returns the verb specified by the syntax_tree
 get-verb() {
   local prefix
   prefix="$1"
@@ -95,18 +98,21 @@ parse() {
   # for each word in the input:
   #   if the prefix + word is in the syntax_tree, continue
   #   if the prefix + "OBJ" is in the syntax_tree, parse an object and continue
-  #   error
+  #   otherwise, error
   # if syntax_tree[prefix] is null, error
   # otherwise, return successfully
+
+  # initialize verb, dobject, and iobject
   verb=
   dobject=
   iobject=
+
   # -l ensures that word will always be converted to lower case for consistency
   local -l word
   word="$1"
 
-  prefix="$word"
-  raw_prefix="$1"
+  prefix="$word"  # store the canonical (lowercase) form of the parsed prefix
+  raw_prefix="$1"  # store the original form for reporting
   shift
 
   if ! grammatical? "$prefix"; then

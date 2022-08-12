@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# start preamble
+### start preamble
 
 # set stricter error handling
 set -o errexit
@@ -22,7 +22,7 @@ fi
 \unalias -a                   # clear any aliases the user might have set
 hash -r                       # purge the command hash table
 
-# end preamble
+### end preamble
 
 # now we load all of our libraries
 source arrayops.bash

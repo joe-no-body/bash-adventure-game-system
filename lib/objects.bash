@@ -1,3 +1,4 @@
+# Object handling functions.
 source utils.bash
 
 declare -gA OBJECT_ATTRS

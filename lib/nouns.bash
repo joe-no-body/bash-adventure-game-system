@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Logic for defining nouns.
+# TODO: actually use this, as it's currently not used.
+
 set -euo pipefail
 
 declare -gA nouns=()
