@@ -48,7 +48,7 @@ bags::main() {
   # main loop
   while true; do
     if ! read -rep "> " -a response; then
-      echo "error"
+      echo "error reading input"
       exit 1
     fi
 
