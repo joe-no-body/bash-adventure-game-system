@@ -31,18 +31,24 @@ declare -gA syntax_tree=(
   #       [attack OBJ with OBJ]=verb::attack
 )
 
-# syntax attack OBJ with OBJ = verb::attack
+# syntax inserts an entry into syntax_tree.
+# example usage: syntax attack OBJ with OBJ = verb::attack
 syntax() {
   local -a syntax
-  local word verb_func
-
-  # TODO: validate that no more than two objects are defined
+  local word verb_func nobjs=0
 
   while (( "$#" )); do
     word="$1"
     shift
     if [[ "$word" == '=' ]]; then
       break
+    fi
+    if [[ "$word" == OBJ ]]; then
+      : $(( nobjs++ ))  # using : prevents this from returning a nonzero status
+      if (( nobjs > 2 )); then
+        internal_error "syntax '${syntax[*]} $word $*' includes more than two"\
+                       "objects"
+      fi
     fi
     syntax+=("$word")
   done

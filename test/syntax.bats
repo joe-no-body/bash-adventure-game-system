@@ -38,3 +38,9 @@ setup() {
   assert [ "${syntax_tree[foo OBJ bar]}" == '' ]
   assert [ "${syntax_tree[foo OBJ bar OBJ]}" == 'verb::foo-bar' ]
 }
+
+@test "syntax - more than two OBJs is forbidden" {
+  run syntax foo OBJ bar OBJ OBJ = verb::foo-bar-fail
+  assert_failure
+  assert_output --partial "syntax 'foo OBJ bar OBJ OBJ = verb::foo-bar-fail' includes more than two objects"
+}
