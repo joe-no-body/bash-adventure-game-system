@@ -7,4 +7,4 @@ lint:
 
 .PHONY: test
 test:
-	bats test
+	node_modules/bats/bin/bats test
