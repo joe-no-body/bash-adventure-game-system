@@ -77,6 +77,15 @@ complete?() {
   [[ -v syntax_tree["$1"] ]] && [[ "${syntax_tree["$1"]}" != "" ]]
 }
 
+# article? tests if the given string is an article. currently only "the" is
+# supported
+article?() {
+  # TODO support other articles
+
+  # XXX there's no way this can be this simple
+  [[ "$1" == the ]]
+}
+
 # get-verb returns the verb specified by the syntax_tree
 get-verb() {
   local prefix
@@ -133,6 +142,10 @@ parse() {
       # failed to match a literal or an object -> error
       syntax_error "I can't make sense of '$word' at the end of '$raw_prefix'"
       return 1
+    fi
+
+    if article? "$word"; then
+      continue
     fi
 
     # try matching an object

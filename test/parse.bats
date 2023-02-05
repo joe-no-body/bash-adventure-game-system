@@ -15,7 +15,7 @@ setup() {
   syntax go OBJ = verb::go
 
   syntax take OBJ = verb::take
-  syntax take the OBJ = verb::take
+  syntax take OBJ = verb::take
 
   syntax attack OBJ with OBJ = verb::attack
 }
@@ -70,6 +70,14 @@ setup() {
 
 @test "parse 'attack troll with sword'" {
   run parse::main attack troll with sword
+  assert_success
+  assert_output --partial "verb=verb::attack"
+  assert_output --partial "dobject=troll"
+  assert_output --partial "iobject=sword"
+}
+
+@test "parse 'attack the troll with the sword'" {
+  run parse::main attack the troll with the sword
   assert_success
   assert_output --partial "verb=verb::attack"
   assert_output --partial "dobject=troll"
