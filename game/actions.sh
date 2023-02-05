@@ -1,17 +1,22 @@
 verb::look() {
-  if [[ "$dobject" ]]; then
-    if [[ "$iobject" ]]; then
-      echo "You look at the $dobject with the $iobject"
-    else
-      echo "You look at the $dobject"
-    fi
-  else
-    echo "$(get-attr "$location" long_description)"
+  # "look"
+  if [[ ! "$dobject" ]]; then
+    get-attr "$location" long_description
+    return
   fi
+
+  # "look [at] OBJ"
+  if [[ ! "$iobject" ]]; then
+    echo "You look at the $dobject"
+    return
+  fi
+
+  # "look [at] OBJ [with] OBJ"
+  echo "You look at the $dobject with the $iobject"
 }
 
 verb::go() {
-  local direction= destination=
+  local direction='' destination=''
 
   case "$dobject" in
     n|north) direction=north ;;
