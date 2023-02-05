@@ -44,8 +44,7 @@ syntax() {
       break
     fi
     if [[ "$word" == OBJ ]]; then
-      : $(( nobjs++ ))  # using : prevents this from returning a nonzero status
-      if (( nobjs > 2 )); then
+      if (( ++nobjs > 2 )); then
         internal_error "syntax '${syntax[*]} $word $*' includes more than two"\
                        "objects"
       fi
