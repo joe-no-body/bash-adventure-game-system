@@ -17,7 +17,6 @@ system.
 * interrupts
 * saving and loading game state from files
 
-
 ### Repo structure
 
 * `doc/`: documentation and notes
@@ -27,10 +26,10 @@ system.
 
 ### Install
 
-
+TODO
 
 ### Testing
 
-```
-npm test
-```
+Run `make` to lint and test.
+
+Run `bash game/main.sh` to play the (extremely rudimentary) demo game.
