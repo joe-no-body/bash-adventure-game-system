@@ -1,2 +1,3 @@
 source-path=lib/
 disable=SC2211
+shell=bash
