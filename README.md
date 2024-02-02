@@ -54,17 +54,18 @@ is ignored when it's found where an object is expected, so
 `attack troll with sword`.
 
 There is a game object management system partially implemented in `objects.bash`
-that should eventually be integrated with the parser. The object management
-system aims to create discrete objects with unique identifiers, so `the sword`
-would be resolved to an identifier like `object::golden-sword` rather than just
-`sword`.
+that should eventually be integrated with the parser. Work to do this is
+partially done in `nouns.bash` but not yet integrated with the main command
+parser. The object management system aims to create discrete objects with unique
+identifiers, so `the sword` would be resolved to an identifier like
+`object::golden-sword` rather than just `sword`.
 
-The ultimate aim of this integration would be to support adjectives with
-disambiguation. If the golden sword is the only item currently in the player's
-reach that could be called `the sword`, then `the sword` would be resolved to
-`object::golden-sword`. Otherwise, `parse` would return an error asking the
-player to clarify further, by describing the sword using an adjective like
-`golden sword`.
+The ultimate aim of this integration would be to support noun phrases (ex. `the
+living room`) and disambiguation of nouns using adjectives (ex. if the current
+room has a single object called `the golden sword`, then you can refer to it as
+just `sword`, but if it has two objects called `the golden sword` and 
+`the silver sword` then you have to say `golden sword` to make it clear what you
+mean).
 
 
 ### Dev requirements
