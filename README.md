@@ -26,7 +26,7 @@ system.
 
 ### Install
 
-TODO
+Run `npm install` to get required dependencies for testing.
 
 ### Testing
 
