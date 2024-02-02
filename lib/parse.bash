@@ -13,8 +13,6 @@ declare -gA syntax_tree=(
 
   # [take]=
   #   [take OBJ]=verb::take
-  #   [take the]=
-  #     [take the OBJ]=verb::take
 
   # [look]=verb::look
   #   [look OBJ]=verb::look
