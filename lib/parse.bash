@@ -29,8 +29,10 @@ declare -gA syntax_tree=(
   #       [attack OBJ with OBJ]=verb::attack
 )
 
-# syntax inserts an entry into syntax_tree.
-# example usage: syntax attack OBJ with OBJ = verb::attack
+# syntax defines a new command syntax by updating syntax_tree.
+#
+# example usage:
+#   syntax attack OBJ with OBJ = verb::attack
 syntax() {
   local -a syntax
   local word verb_func nobjs=0
@@ -95,11 +97,15 @@ get-verb() {
   echo "${syntax_tree["$prefix"]}"
 }
 
+# syntax_error sets the error status and returns
 syntax_error() {
   error="$*"
   return 1
 }
 
+# parse attempts to parse the given command using the syntax_tree and populates
+# the global variables verb, dobject, and iobject with the result of the parse.
+# See parse.bats for examples.
 parse() {
   # for each word in the input:
   #   if the prefix + word is in the syntax_tree, continue
