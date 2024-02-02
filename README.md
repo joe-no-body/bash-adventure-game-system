@@ -48,25 +48,30 @@ respectively. For example, given the syntax above,
 Sample usage of this parser can be found in `game/syntax.sh`
 and in `test/parse.bats`.
 
-There is partially-implemented support for articles, insofar as `the` is ignored
-when it's found where an object is expected.
+There is partially-implemented support for optional articles -- currently, `the`
+is ignored when it's found where an object is expected, so 
+`attack the troll with the sword` is treated the same as 
+`attack troll with sword`.
 
 There is a game object management system partially implemented in `objects.bash`
 that should eventually be integrated with the parser. The object management
 system aims to create discrete objects with unique identifiers, so `the sword`
-would be resolved to an identifier like `object::golden-sword`. 
+would be resolved to an identifier like `object::golden-sword` rather than just
+`sword`.
 
-As in ZIL, this system should support adjectives, so you could refer to 
-`the golden sword`, `gold sword`, `the sword`, `sword`, etc. If the golden sword is
-the only item currently in the player's reach that could be called `sword`, then
-`the sword` would return `object::golden-sword`, but otherwise it would return
-an error asking the player to clarify further.
+The ultimate aim of this integration would be to support adjectives with
+disambiguation. If the golden sword is the only item currently in the player's
+reach that could be called `the sword`, then `the sword` would be resolved to
+`object::golden-sword`. Otherwise, `parse` would return an error asking the
+player to clarify further, by describing the sword using an adjective like
+`golden sword`.
 
 
 ### Dev requirements
 
 * shellcheck
 * bats
+* npm
 
 ### Features
 
