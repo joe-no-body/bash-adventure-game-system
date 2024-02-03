@@ -92,9 +92,7 @@ setup() {
 
   run nouns::test_parse the foo
   assert_success
-  assert_output --partial "2"
-  assert_output --partial "object::red-foo"
-  assert_output --partial "object::blue-foo"
+  assert_output "word_count=2 object_id=object::red-foo object::blue-foo"
 
   run nouns::test_parse the red foo
   assert_success

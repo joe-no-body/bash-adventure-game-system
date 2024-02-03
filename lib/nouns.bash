@@ -128,9 +128,14 @@ nouns::test_parse() {
 
 nouns::main() {
   # nouns::parse "$@"
-  nouns::define object::bar -t your -s bar
-  declare -p nouns
+  # nouns::define object::bar -t your -s bar
+  # declare -p nouns
+
+  nouns::define object::red-foo -t the -a red -s foo
+  nouns::define object::blue-foo -t the -a blue -s foo
+  nouns::test_parse the foo
 }
+
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
   nouns::main "$@"
 fi
