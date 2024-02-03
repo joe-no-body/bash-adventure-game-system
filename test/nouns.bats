@@ -7,7 +7,7 @@ setup() {
 }
 
 @test "parsing undefined word fails" {
-  run nouns::parse notanoun
+  run nouns::test_parse notanoun
   assert_failure 1
 }
 
@@ -15,17 +15,17 @@ setup() {
   nouns=(
     [foo]=object::foo
   )
-  run nouns::parse foo
+  run nouns::test_parse foo
   assert_success
-  assert_output "1 object::foo"
+  assert_output "word_count=1 object_id=object::foo"
 }
 
 @test "define a noun" {
   nouns::define object::bar -s bar
 
-  run nouns::parse bar
+  run nouns::test_parse bar
   assert_success
-  assert_output "1 object::bar"
+  assert_output "word_count=1 object_id=object::bar"
 }
 
 @test "parse nouns with articles" {
@@ -35,22 +35,22 @@ setup() {
     [foo]=object::foo
   )
 
-  run nouns::parse the foo
+  run nouns::test_parse the foo
   assert_success
-  assert_output "2 object::foo"
+  assert_output "word_count=2 object_id=object::foo"
 }
 
 @test "define nouns with articles" {
   nouns::define object::bar -t your -s bar
   assert [ "${nouns[your]}" = "" ]
   assert [ "${nouns[your bar]}" = "object::bar" ]
-  run nouns::parse bar
+  run nouns::test_parse bar
   assert_success
-  assert_output "1 object::bar"
+  assert_output "word_count=1 object_id=object::bar"
 
-  run nouns::parse your bar
+  run nouns::test_parse your bar
   assert_success
-  assert_output "2 object::bar"
+  assert_output "word_count=2 object_id=object::bar"
 }
 
 @test "define and parse nouns with adjectives" {
@@ -59,25 +59,25 @@ setup() {
   assert [ "${nouns[the foo]}" = "object::red-foo" ]
   assert [ "${nouns[foo]}" = "object::red-foo" ]
 
-  run nouns::parse the foo
+  run nouns::test_parse the foo
   assert_success
-  assert_output "2 object::red-foo"
+  assert_output "word_count=2 object_id=object::red-foo"
 
-  run nouns::parse the red foo
+  run nouns::test_parse the red foo
   assert_success
-  assert_output "3 object::red-foo"
+  assert_output "word_count=3 object_id=object::red-foo"
 }
 
 @test "handle multi-word nouns" {
   nouns::define location::living-room -t the -s "living room"
 
-  run nouns::parse living room
+  run nouns::test_parse living room
   assert_success
-  assert_output "2 location::living-room"
+  assert_output "word_count=2 object_id=location::living-room"
 
-  run nouns::parse the living room
+  run nouns::test_parse the living room
   assert_success
-  assert_output "3 location::living-room"
+  assert_output "word_count=3 object_id=location::living-room"
 }
 
 @test "handle homonymous nouns" {
@@ -90,17 +90,17 @@ setup() {
   assert [ "${nouns[the foo]}" = "object::red-foo object::blue-foo" ]
   assert [ "${nouns[foo]}" = "object::red-foo object::blue-foo" ]
 
-  run nouns::parse the foo
+  run nouns::test_parse the foo
   assert_success
   assert_output --partial "2"
   assert_output --partial "object::red-foo"
   assert_output --partial "object::blue-foo"
 
-  run nouns::parse the red foo
+  run nouns::test_parse the red foo
   assert_success
-  assert_output "3 object::red-foo"
+  assert_output "word_count=3 object_id=object::red-foo"
 
-  run nouns::parse the blue foo
+  run nouns::test_parse the blue foo
   assert_success
-  assert_output "3 object::blue-foo"
+  assert_output "word_count=3 object_id=object::blue-foo"
 }

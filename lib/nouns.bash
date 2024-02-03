@@ -84,13 +84,15 @@ nouns::define() {
   fi
 }
 
-# nouns::parse parses a noun and emits the number of words parsed as well as the
-# unique object identifier of the noun.
+# nouns::parse parses a noun and sets object_id and word_count based on the
+# result.
 nouns::parse() {
-  local object_id=
   local -a prefix=()
   local prefix_str=
-  local word_count="$#"
+
+  # shared variables for return value
+  object_id=
+  word_count="$#"
 
   while (( "$#" )); do
     prefix+=("$1")
@@ -109,9 +111,19 @@ nouns::parse() {
     echo "'$*' doesn't seem to be a complete name I recognize"
     return 1
   fi
+}
 
-  # XXX use shared variables to return results instead of printing the result here
-  printf '%s %s' "$word_count" "$object_id"
+nouns::test_parse() {
+  set -euo pipefail
+
+  error=
+  word_count=
+  object_id=
+  if ! nouns::parse "$@" || [[ "$error" ]]; then
+    echo "noun syntax error: $error" >&2
+    exit 1
+  fi
+  echo "word_count=$word_count object_id=$object_id"
 }
 
 nouns::main() {
