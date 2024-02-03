@@ -1,7 +1,7 @@
 BAGS: Bash Adventure Game System
 ================================
 
-An proof-of-concept adventure game engine written in Bash, inspired by the
+An proof-of-concept adventure game engine written in pure Bash, inspired by the
 classic Infocom ZIL system. This is nowhere near complete and not recommended
 for... well, anything. However, it has some neat code that was fun to write.
 
@@ -67,13 +67,6 @@ just `sword`, but if it has two objects called `the golden sword` and
 `the silver sword` then you have to say `golden sword` to make it clear what you
 mean).
 
-
-### Dev requirements
-
-* shellcheck
-* bats
-* npm
-
 ### Features
 
 * language parsing
@@ -85,6 +78,18 @@ mean).
   * object parsing - support for objects with adjectives and articles
 * interrupts
 * saving and loading game state from files
+
+### Dev requirements
+
+* shellcheck
+* bats
+* npm
+
+### Dependencies
+
+A sufficiently modern version of bash, but nothing else. To maximize
+compatibility, this program is implemented in pure Bash without using any
+external programs like sed, grep, awk, etc.
 
 ### Repo structure
 
