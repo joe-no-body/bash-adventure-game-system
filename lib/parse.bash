@@ -1,5 +1,6 @@
 # A basic parser for English commands.
 source utils.bash
+source nouns.bash
 
 # The syntax_tree is represented as an associative array of valid prefixes, with
 # full valid command structures being denoted by a value referencing a
@@ -144,27 +145,30 @@ parse() {
       continue
     fi
 
-    # make sure an object's noun phrase can go here
+    # check if we're expecting a noun phrase here
     if ! grammatical? "$prefix OBJ"; then
       # failed to match a literal or an object -> error
       syntax_error "I can't make sense of '$word' at the end of '$raw_prefix'"
       return 1
     fi
 
-    if article? "$word"; then
-      continue
-    fi
-
-    # try matching an object
     if [[ "$dobject" == "" ]]; then
-      dobject="$word"
+      object_id=
+      word_count=
+      nouns::parse "${words[@]:idx}"
+      dobject="$object_id"
       prefix="$prefix OBJ"
+      (( idx+= word_count ))
       continue
     fi
 
     if [[ "$iobject" == "" ]]; then
-      iobject="$word"
+      object_id=
+      word_count=
+      nouns::parse "${words[@]:idx}"
+      iobject="$object_id"
       prefix="$prefix OBJ"
+      (( idx+= word_count ))
       continue
     fi
 

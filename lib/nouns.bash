@@ -98,6 +98,10 @@ nouns::parse() {
     prefix+=("$1")
     prefix_str="${prefix[*]}"
     shift
+
+    # XXX I think this checks if we've matched a full object name.
+    # That might be trouble if we have objects that have overlapping prefixes.
+    # (ex. "the ruby" and "the ruby slippers")
     if [[ -v nouns["${prefix_str}"] ]] && [[ "${nouns["$prefix_str"]}" ]]; then
       object_id="${nouns["$prefix_str"]}"
       break
