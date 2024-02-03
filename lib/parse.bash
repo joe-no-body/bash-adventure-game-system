@@ -119,20 +119,24 @@ parse() {
   dobject=
   iobject=
 
+  local idx
+  local -a words=("$@")
+  local nwords="$#"
+
   # -l ensures that word will always be converted to lower case for consistency
   local -l word
   word="$1"
 
   prefix="$word"  # store the canonical (lowercase) form of the parsed prefix
   raw_prefix="$1"  # store the original form for error reporting
-  shift
 
   if ! grammatical? "$prefix"; then
     syntax_error "I don't know how to $prefix"
     return 1
   fi
 
-  for word; do
+  for (( idx=1; idx<nwords; idx++ )); do
+    word="${words[idx]}"
     raw_prefix="$raw_prefix $word"
     # try matching a literal
     if grammatical? "$prefix $word"; then
