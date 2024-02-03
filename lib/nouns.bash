@@ -84,6 +84,8 @@ nouns::define() {
   fi
 }
 
+# nouns::parse parses a noun and emits the number of words parsed as well as the
+# unique object identifier of the noun.
 nouns::parse() {
   local object_id=
   local -a prefix=()
@@ -100,13 +102,15 @@ nouns::parse() {
     fi
   done
 
-  # TODO: handle homonyms
+  # TODO: handle ambiguity when multiple objects are matched
 
   if [[ "$object_id" == "" ]]; then
+    # TODO: report errors properly
     echo "'$*' doesn't seem to be a complete name I recognize"
     return 1
   fi
 
+  # XXX use shared variables to return results instead of printing the result here
   printf '%s %s' "$word_count" "$object_id"
 }
 

@@ -2,7 +2,7 @@
 source utils.bash
 
 # The syntax_tree is represented as an associative array of valid prefixes, with
-# full valid sentences structures being denoted by a value referencing a
+# full valid command structures being denoted by a value referencing a
 # corresponding verb function. An example syntax_tree is illustrated by the
 # comments below.
 declare -gA syntax_tree=(
@@ -124,7 +124,7 @@ parse() {
   word="$1"
 
   prefix="$word"  # store the canonical (lowercase) form of the parsed prefix
-  raw_prefix="$1"  # store the original form for reporting
+  raw_prefix="$1"  # store the original form for error reporting
   shift
 
   if ! grammatical? "$prefix"; then
