@@ -120,6 +120,8 @@ parse() {
   dobject=
   iobject=
 
+  local object_id word_count
+
   local idx
   local -a words=("$@")
   local nwords="$#"
@@ -158,7 +160,7 @@ parse() {
       nouns::parse "${words[@]:idx}"
       dobject="$object_id"
       prefix="$prefix OBJ"
-      (( idx+= word_count ))
+      : $(( idx += word_count - 1 ))
       continue
     fi
 
@@ -168,7 +170,7 @@ parse() {
       nouns::parse "${words[@]:idx}"
       iobject="$object_id"
       prefix="$prefix OBJ"
-      (( idx+= word_count ))
+      : $(( idx += word_count - 1 ))
       continue
     fi
 
@@ -177,7 +179,11 @@ parse() {
   done
 
   if ! complete? "$prefix"; then
-    syntax_error "Your sentence seems to end before it's meant to be finished."
+    {
+      echo "=== DEBUG ==="
+      declare -p syntax_tree word raw_prefix idx object_id word_count prefix iobject dobject
+    } >&2
+    syntax_error "Your sentence seems to end before it's meant to be finished ('$prefix')"
     return 1
   fi
 

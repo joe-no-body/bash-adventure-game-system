@@ -92,11 +92,12 @@ nouns::parse() {
 
   # shared variables for return value
   object_id=
-  word_count="$#"
+  word_count=0
 
   while (( "$#" )); do
     prefix+=("$1")
     prefix_str="${prefix[*]}"
+    ((word_count++))
     shift
 
     # XXX I think this checks if we've matched a full object name.
