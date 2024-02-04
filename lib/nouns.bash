@@ -87,24 +87,29 @@ nouns::define() {
 # nouns::parse parses a noun and sets object_id and word_count based on the
 # result.
 nouns::parse() {
-  local -a prefix=()
-  local prefix_str=
+  local -a noun_prefix=()
+  local noun_prefix_str=
+
+  local -a args=("$@")
+  local idx
+  local word
 
   # shared variables for return value
   object_id=
   word_count=0
 
-  while (( "$#" )); do
-    prefix+=("$1")
-    prefix_str="${prefix[*]}"
+  for (( idx=0; idx<"$#"; idx++ )); do
+    word="${args[idx]}"
+
+    noun_prefix+=("$word")
+    noun_prefix_str="${noun_prefix[*]}"
     ((word_count++))
-    shift
 
     # XXX I think this checks if we've matched a full object name.
     # That might be trouble if we have objects that have overlapping prefixes.
     # (ex. "the ruby" and "the ruby slippers")
-    if [[ -v nouns["${prefix_str}"] ]] && [[ "${nouns["$prefix_str"]}" ]]; then
-      object_id="${nouns["$prefix_str"]}"
+    if [[ -v nouns["${noun_prefix_str}"] && "${nouns["$noun_prefix_str"]}" ]]; then
+      object_id="${nouns["$noun_prefix_str"]}"
       break
     fi
   done
@@ -113,7 +118,7 @@ nouns::parse() {
 
   if [[ "$object_id" == "" ]]; then
     # TODO: report errors properly
-    echo "'$*' doesn't seem to be a complete name I recognize"
+    syntax_error "'$*' doesn't seem to be a complete name I recognize"
     return 1
   fi
 }
