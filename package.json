@@ -15,7 +15,7 @@
   "author": "joe-no-body",
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "bats": "^1.2.1",
+    "bats": "^1.10.0",
     "bats-assert": "git+https://github.com/ztombol/bats-assert.git",
     "bats-support": "git+https://github.com/ztombol/bats-support.git"
   }
