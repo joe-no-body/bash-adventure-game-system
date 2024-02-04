@@ -17,6 +17,12 @@ setup() {
   syntax take OBJ = verb::take
 
   syntax attack OBJ with OBJ = verb::attack
+
+  nouns::define object::box -s box
+  nouns::define object::north -s north
+  nouns::define object::stick -t the -s stick
+  nouns::define object::troll -t the -s troll
+  nouns::define object::sword -t the -s sword
 }
 
 @test "parse standalone verb 'look'" {
@@ -31,7 +37,7 @@ setup() {
   run parse::main look in box
   assert_success
   assert_output --partial "verb=verb::look-inside"
-  assert_output --partial "dobject=box"
+  assert_output --partial "dobject=object::box"
   assert_output --partial "iobject="
 }
 
@@ -47,7 +53,7 @@ setup() {
   run parse::main go north
   assert_success
   assert_output --partial "verb=verb::go"
-  assert_output --partial "dobject=north"
+  assert_output --partial "dobject=object::north"
   assert_output --partial "iobject="
 }
 
@@ -55,7 +61,7 @@ setup() {
   run parse::main take stick
   assert_success
   assert_output --partial "verb=verb::take"
-  assert_output --partial "dobject=stick"
+  assert_output --partial "dobject=object::stick"
   assert_output --partial "iobject="
 }
 
@@ -63,7 +69,7 @@ setup() {
   run parse::main take the stick
   assert_success
   assert_output --partial "verb=verb::take"
-  assert_output --partial "dobject=stick"
+  assert_output --partial "dobject=object::stick"
   assert_output --partial "iobject="
 }
 
@@ -71,16 +77,16 @@ setup() {
   run parse::main attack troll with sword
   assert_success
   assert_output --partial "verb=verb::attack"
-  assert_output --partial "dobject=troll"
-  assert_output --partial "iobject=sword"
+  assert_output --partial "dobject=object::troll"
+  assert_output --partial "iobject=object::sword"
 }
 
 @test "parse 'attack the troll with the sword'" {
   run parse::main attack the troll with the sword
   assert_success
   assert_output --partial "verb=verb::attack"
-  assert_output --partial "dobject=troll"
-  assert_output --partial "iobject=sword"
+  assert_output --partial "dobject=object::troll"
+  assert_output --partial "iobject=object::sword"
 }
 
 @test "throw parse error if first word isn't a verb" {
