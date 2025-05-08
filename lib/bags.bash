@@ -40,6 +40,7 @@ bags::main() {
   fi
 
   # init shared variables
+  # shellcheck disable=SC2034
   local rawverb=
   local verb=
   local dobject=

@@ -129,7 +129,10 @@ parse() {
   # -l ensures that word will always be converted to lower case for consistency
   local -l word
   word="$1"
-  # XXX: quick hack here to set rawverb for use in verb::go
+
+  # Store the exact verb provided by the player for cases where we want to
+  # handle aliases or synonyms in special ways.
+  # shellcheck disable=SC2034
   rawverb="$1"
 
   prefix="$word"  # store the canonical (lowercase) form of the parsed prefix
