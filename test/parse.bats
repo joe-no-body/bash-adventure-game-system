@@ -21,7 +21,7 @@ setup() {
   nouns::define object::box -s box
   nouns::define object::north -s north
   nouns::define object::stick -t the -s stick
-  nouns::define object::troll -t the -s troll
+  nouns::define object::troll -t the -a angry -s troll
   nouns::define object::sword -t the -s sword
 }
 
@@ -83,6 +83,14 @@ setup() {
 
 @test "parse 'attack the troll with the sword'" {
   run parse::main attack the troll with the sword
+  assert_success
+  assert_output --partial "verb=verb::attack"
+  assert_output --partial "dobject=object::troll"
+  assert_output --partial "iobject=object::sword"
+}
+
+@test "parse 'attack the angry troll with the sword'" {
+  run parse::main attack the angry troll with the sword
   assert_success
   assert_output --partial "verb=verb::attack"
   assert_output --partial "dobject=object::troll"
