@@ -40,6 +40,7 @@ bags::main() {
   fi
 
   # init shared variables
+  local rawverb=
   local verb=
   local dobject=
   local iobject=

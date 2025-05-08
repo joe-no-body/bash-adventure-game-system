@@ -129,6 +129,8 @@ parse() {
   # -l ensures that word will always be converted to lower case for consistency
   local -l word
   word="$1"
+  # XXX: quick hack here to set rawverb for use in verb::go
+  rawverb="$1"
 
   prefix="$word"  # store the canonical (lowercase) form of the parsed prefix
   raw_prefix="$1"  # store the original form for error reporting

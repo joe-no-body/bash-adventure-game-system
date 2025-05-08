@@ -18,13 +18,22 @@ verb::look() {
 verb::go() {
   local direction='' destination=''
 
-  case "$dobject" in
-    object::north) direction=north ;;
-    object::east) direction=east ;;
-    object::south) direction=south ;;
-    object::west) direction=west ;;
+  case "$rawverb" in
+    n|north) direction=north ;;
+    e|east) direction=east ;;
+    s|south) direction=south ;;
+    w|west) direction=west ;;
   esac
-  if [[ "$direction" == "" ]]; then
+
+  if [[ ! "$direction" ]]; then
+    case "$dobject" in
+      object::north) direction=north ;;
+      object::east) direction=east ;;
+      object::south) direction=south ;;
+      object::west) direction=west ;;
+    esac
+  fi
+  if [[ ! "$direction" ]]; then
     # TODO: get the human-readable name for the object
     echo "'$dobject' isn't a place or direction I'm aware of. Try 'north', 'east', 'south', or 'west'."
     return
