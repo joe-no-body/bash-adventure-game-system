@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# shellcheck source=../lib/bags.bash
 source lib/bags.bash
 source game/syntax.sh
 source game/objects.sh
