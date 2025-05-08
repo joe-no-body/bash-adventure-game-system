@@ -1,3 +1,9 @@
+# These globals are expected to be set by BAGS, but we initialize them here to
+# make shellcheck be quiet.
+dobject=
+iobject=
+rawverb=
+
 verb::look() {
   # "look"
   if [[ ! "$dobject" ]]; then
@@ -46,6 +52,8 @@ verb::go() {
 
   destination="$(get-attr "$location" "$direction")"
 
+  # If the destination has the prefix "sorry@", strip the prefix and print out
+  # the string verbatim - the path is blocked off.
   case "$destination" in
     sorry@*)
       echo "${destination#sorry@}"

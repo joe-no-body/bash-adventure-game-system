@@ -1,3 +1,4 @@
+# shellcheck disable=SC2034
 location='room::west-of-house'
 
 
