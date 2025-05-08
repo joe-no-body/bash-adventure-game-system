@@ -48,7 +48,7 @@ syntax() {
     if [[ "$word" == OBJ ]]; then
       if (( ++nobjs > 2 )); then
         internal_error "syntax '${syntax[*]} $word $*' includes more than two"\
-                       "objects"
+                       "OBJ placeholders - a maximum of two is permitted"
       fi
     fi
     syntax+=("$word")
@@ -197,7 +197,7 @@ parse() {
 
     # "$prefix OBJ" is grammatical, so now we try parsing a noun phrase.
 
-    # Parse the first object from the noun phrase.
+    # Parse the direct object from the noun phrase if we don't have one yet.
     if [[ ! "$dobject" ]]; then
       object_id=
       word_count=
@@ -208,6 +208,8 @@ parse() {
       continue
     fi
 
+    # Parse the indirect object from the noun phrase if we already have a direct
+    # object.
     if [[ ! "$iobject" ]]; then
       object_id=
       word_count=
@@ -218,15 +220,19 @@ parse() {
       continue
     fi
 
+    # If we have both a direct and indirect object already, the defined syntax
+    # has too many OBJ placeholders.
     internal_error "the syntax '$prefix OBJ' has too many objects defined or the parser state has gotten borked. dobject and iobject are already defined, but the defined syntax wants another object. (dobject='$dobject', iobject='$iobject')"
     return 1
   done
 
+  # Ensure we have parsed a complete valid command.
   if ! complete? "$prefix"; then
     syntax_error "Your sentence seems to end before it's meant to be finished ('$prefix')"
     return 1
   fi
 
+  # Get the verb corresponding to this command from syntax_tree.
   verb="$(get-verb "$prefix")"
 }
 
