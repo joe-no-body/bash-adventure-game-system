@@ -48,9 +48,12 @@ bags::main() {
   local error=
   local -a response
 
+  # If player_prompt isn't already defined, we initialize it here.
+  : "${player_prompt:=> }"
+
   # main loop
   while true; do
-    if ! read -rep "> " -a response; then
+    if ! read -rep "$player_prompt" -a response; then
       echo "error reading input"
       exit 1
     fi
