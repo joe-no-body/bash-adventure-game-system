@@ -4,30 +4,75 @@
 
 set -euo pipefail
 
-declare -gA nouns=()
+# nouns is an associative array that defines valid noun phrases. As with
+# `syntax_tree`, `nouns` contains a set of valid prefixes and full noun phrases
+# which are used during parsing to identify syntax errors.
+declare -gA nouns=(
+  # Example noun prefix tree:
 
-# usage: nouns::ensure ...STR
-# Ensure the given key is set in the map.
+  # [west]="object::west"
+  # [north]="object::north"
+  # [east]="object::east"
+  # [south]="object::south"
+
+  # [the]=""
+    # ["the angry"]=""
+      # ["the angry troll"]="object::troll"
+    # ["the sword"]="object::sword"
+
+  # ["the troll"]="object::troll"
+
+  # [angry]=""
+    # ["angry troll"]="object::troll"
+
+  # [troll]="object::troll"
+
+  # [sword]="object::sword"
+)
+
+
+# nouns::ensure checks whether the given noun phrase or prefix is defined in the
+# map. This includes partial prefixes.
+#
+# usage: nouns::ensure ...NOUNPHRASE
 nouns::ensure() {
   [[ -v nouns["$*"] ]] || nouns["$*"]=''
 }
 
-# usage: nouns::add OBJECT ...STR
+# nouns::is-complete takes a noun phrase and checks that it's complete (rather
+# than being a valid but incomplete prefix).
+nouns::is-complete() {
+  [[ -v nouns["$*"] && "${nouns["$*"]}" ]]
+}
+
+# nouns::add adds a given noun phrase to the `nouns` map. It takes an object
+# identifier followed by one or more arguments defining the phrase. It splits
+# the given phrase on spaces (potentially re-splitting if multiple arguments are
+# provided) and validates that each successive prefix of the phrase is in the
+# map.
+#
+# usage: nouns::add OBJECT ...NOUNPHRASE
 nouns::add() {
   local -a prefix=()
   local object_id="$1"
   shift
 
-  # ensure each substring is defined as a valid prefix
-  # we actually want to split on spaces here, so we use $* unquoted on purpose
+  local arg
+
+  # Ensure each substring is defined as a valid prefix.
+  # XXX: Wait... how do partial noun phrases actually get added to `nouns`??
+  #
+  # We actually want to split on spaces here, so we use $* unquoted on purpose.
+  #
   # shellcheck disable=SC2048
   for arg in $*; do
     prefix+=("$arg")
-    nouns::ensure "${prefix[@]}"
+    nouns::ensure "${prefix[@]}" || internal_error "The prefix '${prefix[*]}' is missing from the nouns map. (Error encountered in nouns:add while attempting to define object_id='$object_id' with noun phrase '$*'.)"
   done
 
-  # ensure the whole thing is defined and mapped to the object
-  # TODO: append so we handle homonyms
+  # Map the complete phrase to an object id. If there is already an object id
+  # mapped for this key, append the new id delimited by a space. (TODO: use this
+  # elsewhere.)
   if [[ "${nouns["$*"]}" ]]; then
     nouns["$*"]="${nouns["$*"]} $object_id"
   else
@@ -35,7 +80,11 @@ nouns::add() {
   fi
 }
 
-# Usage: nouns::define OBJECT-ID [-t ARTICLE] [-a ADJECTIVES...] [-s SYNONYMS...]
+# nouns::define takes an object id and an article (optional), adjective
+# (optional), and name by which the object may be called. It adds noun phrases
+# corresponding to this object to the global `nouns` map.
+#
+# Usage: nouns::define OBJECT-ID [-t ARTICLE] [-a ADJECTIVE] [-s NAME]
 nouns::define() {
   local object_id="$1"
   shift
@@ -84,8 +133,9 @@ nouns::define() {
   fi
 }
 
-# nouns::parse parses a noun and sets object_id and word_count based on the
-# result.
+# nouns::parse parses a noun phrase and sets the shared variables `object_id`
+# and `word_count` based on the result. This is expected to be called from the
+# `parse` function.
 nouns::parse() {
   local -a noun_prefix=()
   local noun_prefix_str=
@@ -108,6 +158,7 @@ nouns::parse() {
     # XXX I think this checks if we've matched a full object name.
     # That might be trouble if we have objects that have overlapping prefixes.
     # (ex. "the ruby" and "the ruby slippers")
+    # TODO: use nouns::is-complete here!
     if [[ -v nouns["${noun_prefix_str}"] && "${nouns["$noun_prefix_str"]}" ]]; then
       object_id="${nouns["$noun_prefix_str"]}"
       break
