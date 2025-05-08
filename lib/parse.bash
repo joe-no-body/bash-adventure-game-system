@@ -2,11 +2,12 @@
 source utils.bash
 source nouns.bash
 
-# The syntax_tree is represented as an associative array of valid prefixes, with
-# full valid command structures being denoted by a value referencing a
-# corresponding verb function. An example syntax_tree is illustrated by the
-# comments below.
+# Each key of syntax_tree represents a valid prefix or, if it has a non-null
+# value, a full valid command. When the value is non-null, it should contain the
+# name of the verb function used to execute the command.
 declare -gA syntax_tree=(
+  # The comments below illustrate an example syntax tree.
+
   # [yell]=verb::yell
 
   # [go]=
@@ -106,60 +107,98 @@ syntax_error() {
 
 # parse attempts to parse the given command using the syntax_tree and populates
 # the global variables verb, dobject, and iobject with the result of the parse.
-# See parse.bats for examples.
+# See test/parse.bats for examples.
 parse() {
   # for each word in the input:
-  #   if the prefix + word is in the syntax_tree, continue
-  #   if the prefix + "OBJ" is in the syntax_tree, parse an object and continue
-  #   otherwise, error
-  # if syntax_tree[prefix] is null, error
-  # otherwise, return successfully
+  #   - if "$prefix $word" is in the syntax_tree, set prefix="$prefix $word" and
+  #     continue
+  #   - if "$prefix OBJ" is in the syntax_tree, set prefix="$prefix OBJ", parse
+  #     a noun phrase, set dobject or iobject to the parsed object's id, and
+  #     continue
+  #   - otherwise, report a parsing error
+  #
+  # finally:
+  #   - if syntax_tree[$prefix] is null, return an error - the input appears
+  #     incomplete
+  #   - if it's not null, set verb=syntax_tree[prefix] and return - we've
+  #     successfully parsed the input!
 
-  # initialize verb, dobject, and iobject
+  # initialize the output globals we'll use to report the results of parsing.
   verb=
   dobject=
   iobject=
 
-  local object_id word_count
-
-  local idx
   local -a words=("$@")
   local nwords="$#"
 
-  # -l ensures that word will always be converted to lower case for consistency
+  # `word` stores the current word being parsed and is updated in each iteration
+  # of the loop below. The -l flag converts `word` to lowercase for ease of
+  # parsing.
   local -l word
   word="$1"
 
-  # Store the exact verb provided by the player for cases where we want to
-  # handle aliases or synonyms in special ways.
-  # shellcheck disable=SC2034
-  rawverb="$1"
-
-  prefix="$word"  # store the canonical (lowercase) form of the parsed prefix
-  raw_prefix="$1"  # store the original form for error reporting
-
-  if ! grammatical? "$prefix"; then
-    syntax_error "I don't know how to $prefix"
+  # Validate that the first word is a valid prefix in syntax_tree.
+  if ! grammatical? "$word"; then
+    syntax_error "I don't know how to $word"
     return 1
   fi
 
-  for (( idx=1; idx<nwords; idx++ )); do
+  # We store the exact verb provided by the player in `rawverb` for cases where
+  # we want to handle aliases or synonyms in special ways.
+  #
+  # shellcheck disable=SC2034
+  rawverb="$1"
+
+  # `prefix` contains the parsed prefix of the user's command in canonical form
+  # (i.e. the form we expect to see in `syntax_tree`). For example, after
+  # parsing "attack the troll with the sword", we would have prefix="attack OBJ
+  # with OBJ".
+  #
+  # (XXX: "prefix" is kind of a misnomer here, because it's no longer
+  # a prefix at the last iteration of the loop. The point is that we want to
+  # successively match entries in syntax_tree that represent prefixes of a valid
+  # command until we finally match a full valid command.)
+  prefix="$word"
+
+  # `raw_prefix` contains the parsed prefix of the user's command in the
+  # verbatim form that they entered it.
+  raw_prefix="$1"  # store the original form for error reporting
+
+  # Declare loop local variables.
+  local -i idx  # current word index
+  local object_id  # temp var for the object identifier returned by nouns::parse
+  local -i word_count  # number of words encountered when parsing a noun
+
+  # Note here that we've already parsed the first word of the command.
+
+  # We use a C-style for loop so we can easily skip forward or backward in the
+  # array of input words.
+  for (( idx=1; idx < nwords; idx++ )); do
     word="${words[idx]}"
     raw_prefix="$raw_prefix $word"
-    # try matching a literal
+
+    # At each point during parsing, we expect to either match a literal word
+    # or a noun phrase, represented by the placeholder "OBJ".
+
+    # Try matching a literal word from the syntax_tree. For example, in the
+    # first iteration of parsing "look in the box", we'd have prefix="look" and
+    # word="in", so we check if "look in" is in the syntax_tree.
     if grammatical? "$prefix $word"; then
       prefix="$prefix $word"
       continue
     fi
 
-    # check if we're expecting a noun phrase here
+    # Check if we're expecting a noun phrase here
     if ! grammatical? "$prefix OBJ"; then
       # failed to match a literal or an object -> error
       syntax_error "I can't make sense of '$word' at the end of '$raw_prefix'"
       return 1
     fi
 
-    if [[ "$dobject" == "" ]]; then
+    # "$prefix OBJ" is grammatical, so now we try parsing a noun phrase.
+
+    # Parse the first object from the noun phrase.
+    if [[ ! "$dobject" ]]; then
       object_id=
       word_count=
       nouns::parse "${words[@]:idx}"
@@ -169,7 +208,7 @@ parse() {
       continue
     fi
 
-    if [[ "$iobject" == "" ]]; then
+    if [[ ! "$iobject" ]]; then
       object_id=
       word_count=
       nouns::parse "${words[@]:idx}"
