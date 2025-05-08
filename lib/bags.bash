@@ -10,7 +10,8 @@ set -o pipefail
 # set a safer IFS, though it shouldn't matter if we're digilent with quotes
 IFS=$' \t\n'
 
-# enable function names with special characters like `?`
+# enable function names with special characters like `?` and prevent globbing
+# when variables are unquoted.
 set -o noglob
 
 if [[ ! -v BAGS_LIB_DIR ]]; then
