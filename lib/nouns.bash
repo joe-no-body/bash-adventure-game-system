@@ -31,8 +31,9 @@ declare -gA nouns=(
 )
 
 
-# nouns::ensure checks whether the given noun phrase or prefix is defined in the
-# map. This includes partial prefixes.
+# nouns::ensure ensures that a given noun phrase is present in the map. If it's
+# already defined, it won't be modified. If it's not defined, it'll be set to an
+# empty string.
 #
 # usage: nouns::ensure ...NOUNPHRASE
 nouns::ensure() {
@@ -59,15 +60,14 @@ nouns::add() {
 
   local arg
 
-  # Ensure each substring is defined as a valid prefix.
-  # XXX: Wait... how do partial noun phrases actually get added to `nouns`??
+  # Ensure each substring is defined as a valid prefix in `nouns`.
   #
   # We actually want to split on spaces here, so we use $* unquoted on purpose.
   #
   # shellcheck disable=SC2048
   for arg in $*; do
     prefix+=("$arg")
-    nouns::ensure "${prefix[@]}" || internal_error "The prefix '${prefix[*]}' is missing from the nouns map. (Error encountered in nouns:add while attempting to define object_id='$object_id' with noun phrase '$*'.)"
+    nouns::ensure "${prefix[@]}"
   done
 
   # Map the complete phrase to an object id. If there is already an object id
@@ -192,8 +192,15 @@ nouns::main() {
   # nouns::define object::bar -t your -s bar
   # declare -p nouns
 
+  echo "*** defining nouns"
   nouns::define object::red-foo -t the -a red -s foo
   nouns::define object::blue-foo -t the -a blue -s foo
+
+  echo "=== current state of nouns ==="
+  declare -p nouns
+  echo "======="
+
+  echo "*** running test parse"
   nouns::test_parse the foo
 }
 
