@@ -54,13 +54,10 @@ bags::main() {
       exit 1
     fi
 
-    if [[ "${response[*]}" == "" ]]; then
-      continue
-    fi
-
-    if [[ "${response[0]}" == "quit" ]]; then
-      break
-    fi
+    case "${response[*]}" in
+      '') continue ;;
+      quit|exit) break ;;
+    esac
 
     error=
     if ! parse "${response[@]}" || [[ "$error" ]]; then
