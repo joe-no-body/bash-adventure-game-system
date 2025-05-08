@@ -4,13 +4,19 @@ source utils.bash
 declare -gA OBJECT_ATTRS
 
 #######################################
-# Initialize objects
+# Initialize objects by calling functions with appropriate namespace prefixes.
 #######################################
 init-all-objects() {
   local func
+  # XXX: It would probably be better to require the game implementer to call an
+  # `objects::define` function explicitly for each object init function they
+  # want to declare, but this feels convenient enough I kinda want to stick with
+  # it.
   while read -r func; do
     func="${func#declare -f }"
     case "$func" in
+      # TODO: Support initializing objects with custom prefixes. Perhaps we
+      # could have an array of prefixes or a regex.
       object::*) ;&
       room::*) init-object "$func" ;;
     esac
