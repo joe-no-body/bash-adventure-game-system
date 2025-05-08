@@ -30,6 +30,7 @@ source parse.bash
 source perform.bash
 source utils.bash
 source objects.bash
+source nouns.bash
 
 bags::main() {
   init-all-objects
