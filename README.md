@@ -18,6 +18,9 @@ syntax look at OBJ = verb::look
 
 syntax attack OBJ with OBJ = verb::attack
 
+nouns::define object::troll -t the -a angry -s troll
+nouns::define object::sword -t the -s sword
+
 verb::look() {
   : # TODO: implement looking
 }
@@ -33,43 +36,38 @@ of a function to call if the player enters a command matching the given syntax.
 For example, the syntax entry `syntax look = verb::look` means that we should
 execute the function `verb::look` when the player enters the command `look`.
 
-Syntax entries can optionally accept a single direct object or a direct object
-and indirect object using the keyword `OBJ`.
+Syntax entries can optionally accept up to two objects (the direct and indirect
+object, in that order) using the keyword `OBJ`. These direct and indirect
+objects should be nouns defined using the function `nouns::define`. Nouns may
+have an article and adjective, which can optionally be used to refer to them.
+For example, given the nouns defined above, the player may refer to the troll as
+`troll`, `the troll`, `angry troll`, or `the angry troll` in their commands, all
+of which will be resolved to `object::troll` during parsing.
 
-Commands can be parsed using the function `parse`. `parse` takes a
-series of words as its arguments and attempts to match them to one of the
-defined syntaxes. If it matches successfully, it updates the variables `verb`,
-`dobject`, and `iobject`, which store the function that implements the verb, the
-direct object of the command, and the indirect object of the command,
-respectively. For example, given the syntax above, 
+Commands are parsed using the function `parse`. `parse` takes a series of words
+as its arguments and attempts to match them to one of the defined syntaxes. If
+it matches successfully, it updates the variables `verb`, `dobject`, and
+`iobject`, which can then be used by the `verb::attack` function. For example,
+given the syntax and noun definitions above, calling 
 `parse attack the troll with the sword` would set `verb=verb::attack`, 
-`dobject=troll`, and `iobject=sword`.
+`dobject=object::troll`, and `iobject=object::sword`.
 
-Sample usage of this parser can be found in `game/syntax.sh`
-and in `test/parse.bats`.
-
-There is partially-implemented support for optional articles -- currently, `the`
-is ignored when it's found where an object is expected, so 
-`attack the troll with the sword` is treated the same as 
-`attack troll with sword`.
+Sample usage of this parser can be found in `game/syntax.sh` and in
+`test/parse.bats`.
 
 There is a game object management system partially implemented in `objects.bash`
 that should eventually be integrated with the parser. Work to do this is
-partially done in `nouns.bash` but not yet integrated with the main command
-parser. The object management system aims to create discrete objects with unique
-identifiers, so `the sword` would be resolved to an identifier like
-`object::golden-sword` rather than just `sword`.
-
-The ultimate aim of this integration would be to support noun phrases (ex. `the
-living room`) and disambiguation of nouns using adjectives (ex. if the current
-room has a single object called `the golden sword`, then you can refer to it as
-just `sword`, but if it has two objects called `the golden sword` and 
+partially done in `nouns.bash` and has now been integrated with the main command
+parser. The ultimate aim of this integration is to support noun phrases (ex.
+`the living room`) and disambiguation of nouns using adjectives (ex. if the
+current room has a single object called `the golden sword`, then you can refer
+to it as just `sword`, but if it has two objects called `the golden sword` and
 `the silver sword` then you have to say `golden sword` to make it clear what you
 mean).
 
 ### Features
 
-* language parsing
+* natural language parsing
 * rooms
 
 ### Wishlist
@@ -87,9 +85,11 @@ mean).
 
 ### Dependencies
 
-A sufficiently modern version of bash, but nothing else. To maximize
-compatibility, this program is implemented in pure Bash without using any
-external programs like sed, grep, awk, etc.
+To play the game, only a sufficiently modern version of Bash is required. For
+maximum compatibility, no external programs like sed, grep, awk, etc. are used.
+
+For testing, [bats](https://github.com/bats-core/bats-core) and a couple support
+packages are required. They can be installed using `npm`.
 
 ### Repo structure
 
