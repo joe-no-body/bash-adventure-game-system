@@ -2,6 +2,11 @@
 
 ### start preamble
 
+# ensure the namespace is unpolluted
+\export PATH=""  # purge the path of everything but the BAGS source
+\unalias -a                   # clear any aliases the user might have set
+hash -r                       # purge the command hash table
+
 # set stricter error handling
 set -o errexit
 set -o errtrace
@@ -15,14 +20,35 @@ IFS=$' \t\n'
 # when variables are unquoted.
 set -o noglob
 
+# via https://github.com/dylanaraps/pure-bash-bible
+_dirname() {
+    # Usage: dirname "path"
+    local tmp=${1:-.}
+
+    [[ $tmp != *[!/]* ]] && {
+        printf '/\n'
+        return
+    }
+
+    tmp=${tmp%%"${tmp##*[!/]}"}
+
+    [[ $tmp != */* ]] && {
+        printf '.\n'
+        return
+    }
+
+    tmp=${tmp%/*}
+    tmp=${tmp%%"${tmp##*[!/]}"}
+
+    printf '%s\n' "${tmp:-/}"
+}
+
 if [[ ! -v BAGS_LIB_DIR ]]; then
-  BAGS_LIB_DIR="$(dirname "${BASH_SOURCE[0]}")"
+  BAGS_LIB_DIR="$(_dirname "${BASH_SOURCE[0]}")"
 fi
 
-# ensure the namespace is unpolluted
+# override PATH
 \export PATH="$BAGS_LIB_DIR"  # purge the path of everything but the BAGS source
-\unalias -a                   # clear any aliases the user might have set
-hash -r                       # purge the command hash table
 
 ### end preamble
 
