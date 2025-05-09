@@ -4,6 +4,7 @@
 
 # set stricter error handling
 set -o errexit
+set -o errtrace
 set -o nounset
 set -o pipefail
 
@@ -25,11 +26,28 @@ hash -r                       # purge the command hash table
 
 ### end preamble
 
+## error handling
+source utils.bash
+
+bags::_errtrace() {
+  local err_status=$?
+  if (( err_status == 0 )); then
+    return
+  fi
+
+  echo "=== Fatal error ($ERR_FILE:$ERR_LINENO:$ERR_FUNCNAME) ==="
+  trace 1
+}
+
+declare -g ERR_LINENO ERR_FUNCNAME ERR_FILE
+
+trap 'ERR_LINENO=$LINENO ERR_FUNCNAME=$FUNCNAME ERR_FILE=$BASH_SOURCE' ERR
+trap bags::_errtrace EXIT
+
 # now we load all of our libraries
 source arrayops.bash
 source parse.bash
 source perform.bash
-source utils.bash
 source objects.bash
 source nouns.bash
 

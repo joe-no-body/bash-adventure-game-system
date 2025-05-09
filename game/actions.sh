@@ -68,3 +68,12 @@ verb::go() {
   fi
   set-flag "$location" visited
 }
+
+__do_fail() {
+  return 1
+}
+
+verb::fatal() {
+  echo "inducing a fatal error"
+  __do_fail
+}

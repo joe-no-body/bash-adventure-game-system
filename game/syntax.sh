@@ -18,3 +18,5 @@ syntax w = verb::go
 syntax take OBJ = verb::take
 
 syntax attack OBJ with OBJ = verb::attack
+
+syntax xyzzy = verb::fatal

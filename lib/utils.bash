@@ -26,6 +26,20 @@ trim_string() {
 }
 
 #######################################
+# Read a specific line number from a file.
+# Arguments:
+#   $1 - the file to read from
+#   $2 - the line number to read
+#######################################
+read_file_line() {
+  local file="$1"
+  local line_num="$2"
+  local line
+  mapfile -t -s "$((line_num - 1))" -n 1 line <"$file"
+  printf '%s' "$line"
+}
+
+#######################################
 # Print a stack trace.
 # Arguments:
 #   $1 (optional) - Number of stack frames to skip in the output.
@@ -34,15 +48,28 @@ trim_string() {
 #   code at that line in that file.
 #######################################
 trace() {
-  local line_num func file
-  local -a line
-  local i="${1:-0}"
+  local line_num func file line
+  local i="${1:-1}"
   echo "Traceback (most recent call last):"
-  ((i++))  # Always skip the frame for this function.
-  while caller "$i"; do
+
+  # For some reason, `caller` returns the first line of the first file in the
+  # traceback, so we try to use information set by the ERR trap configured in
+  # bags.bash.
+  if (( i == 1 )) && [[ "$ERR_FILE" ]]; then
+    file="$ERR_FILE"
+    func="$ERR_FUNCNAME"
+    line_num="$ERR_LINENO"
+    line="$(read_file_line "$file" "$line_num")"
+    printf '  %s, line %s, in %s:\n    %s\n' "$file" "$line_num" "$func" "$(trim_string "${line}")"
+    ((i++)) # Skip to the next stack frame.
+  fi
+
+  while read -r line_num func file < <(caller "$i" || true); do
     ((i++))
-  done | while read -r line_num func file; do
-    mapfile -t -s "$((line_num - 1))" -n 1 line <"$file"
+    if ! [[ "$line_num" || "$func" || "$file" ]]; then
+      return
+    fi
+    line="$(read_file_line "$file" "$line_num")"
     printf '  %s, line %s, in %s:\n    %s\n' "$file" "$line_num" "$func" "$(trim_string "${line[0]}")"
   done
 }
