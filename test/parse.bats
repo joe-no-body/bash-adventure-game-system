@@ -97,6 +97,16 @@ setup() {
   assert_output --partial "iobject=object::sword"
 }
 
+@test "report a useful error on an invalid noun - 'attack the ugly troll with the sword'" {
+  run parse::main attack the ugly troll with the sword
+  assert_failure
+
+  assert_output --partial "syntax error"
+  assert_output --partial "ugly"
+  # The error should be specific to the noun.
+  refute_output --partial "seems to end before it's meant to be finished"
+}
+
 @test "throw parse error if first word isn't a verb" {
   run parse::main the
   assert_failure

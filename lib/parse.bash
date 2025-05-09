@@ -201,7 +201,9 @@ parse() {
     if [[ ! "$dobject" ]]; then
       object_id=
       word_count=
-      nouns::parse "${words[@]:idx}"
+      if ! nouns::parse "${words[@]:idx}"; then
+        return 1
+      fi
       dobject="$object_id"
       prefix="$prefix OBJ"
       (( idx += word_count - 1 ))
@@ -213,7 +215,9 @@ parse() {
     if [[ ! "$iobject" ]]; then
       object_id=
       word_count=
-      nouns::parse "${words[@]:idx}"
+      if ! nouns::parse "${words[@]:idx}"; then
+        return 1
+      fi
       iobject="$object_id"
       prefix="$prefix OBJ"
       (( idx += word_count - 1 ))
@@ -228,7 +232,7 @@ parse() {
 
   # Ensure we have parsed a complete valid command.
   if ! complete? "$prefix"; then
-    syntax_error "Your sentence seems to end before it's meant to be finished ('$prefix')"
+    syntax_error "Your sentence seems to end before it's meant to be finished ('$prefix'; '$raw_prefix')"
     return 1
   fi
 
