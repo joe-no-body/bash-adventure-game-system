@@ -76,6 +76,7 @@ mean).
   * object parsing - support for objects with adjectives and articles
 * interrupts
 * saving and loading game state from files
+* NPCs
 
 ### Dev requirements
 
