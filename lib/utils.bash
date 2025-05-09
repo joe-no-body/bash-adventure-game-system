@@ -34,9 +34,9 @@ trim_string() {
 read_file_line() {
   local file="$1"
   local line_num="$2"
-  local line
+  local -a line
   mapfile -t -s "$((line_num - 1))" -n 1 line <"$file"
-  printf '%s' "$line"
+  printf '%s' "${line[0]}"
 }
 
 #######################################
