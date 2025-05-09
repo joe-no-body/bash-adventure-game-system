@@ -249,7 +249,7 @@ parse::main() {
   iobject=
   if ! parse "$@" || [[ "$error" ]]; then
     echo "syntax error: $error" >&2
-    exit 1
+    return 1
   fi
   echo "verb=$verb dobject=$dobject iobject=$iobject"
 }
