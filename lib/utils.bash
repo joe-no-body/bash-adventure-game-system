@@ -55,7 +55,7 @@ trace() {
   # For some reason, `caller` returns the first line of the first file in the
   # traceback, so we try to use information set by the ERR trap configured in
   # bags.bash.
-  if (( i == 1 )) && [[ "$ERR_FILE" ]]; then
+  if (( i == 1 )) && [[ "${ERR_FILE-}" ]]; then
     file="$ERR_FILE"
     func="$ERR_FUNCNAME"
     line_num="$ERR_LINENO"

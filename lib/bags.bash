@@ -31,17 +31,17 @@ source utils.bash
 
 bags::_errtrace() {
   local err_status=$?
-  if (( err_status == 0 )); then
+  if (( err_status == 0 )) || [[ ! "${ERR_FILE-}" ]]; then
     return
   fi
 
-  echo "=== Fatal error ($ERR_FILE:$ERR_LINENO:$ERR_FUNCNAME) ==="
+  echo "=== Fatal error $err_status (${ERR_FILE-}:${ERR_LINENO-}:${ERR_FUNCNAME-}) ==="
   trace 1
 }
 
 declare -g ERR_LINENO ERR_FUNCNAME ERR_FILE
 
-trap 'ERR_LINENO=$LINENO ERR_FUNCNAME=$FUNCNAME ERR_FILE=$BASH_SOURCE' ERR
+trap 'ERR_LINENO=${LINENO-} ERR_FUNCNAME=${FUNCNAME-} ERR_FILE=${BASH_SOURCE-}' ERR
 trap bags::_errtrace EXIT
 
 # now we load all of our libraries
@@ -74,7 +74,7 @@ bags::main() {
   while true; do
     if ! read -rep "$player_prompt" -a response; then
       echo "error reading input"
-      exit 1
+      return
     fi
 
     case "${response[*]}" in
