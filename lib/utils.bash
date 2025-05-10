@@ -1,4 +1,4 @@
-if [[ ! -v UTILS_BASH_ ]]; then
+[[ -v UTILS_BASH_ ]] && return
 UTILS_BASH_=
 readonly STATUS_INTERNAL_ERROR=2
 
@@ -93,5 +93,3 @@ debug() {
     printf '%s, line %s, in %s: %s\n' "${BASH_SOURCE[1]}" "${BASH_LINENO[0]}" "${FUNCNAME[1]}" "$*"
   fi
 } >&2
-
-fi
