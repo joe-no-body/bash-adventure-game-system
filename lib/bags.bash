@@ -20,6 +20,10 @@ IFS=$' \t\n'
 # when variables are unquoted.
 set -o noglob
 
+# Disable tab completion when using `read -e`. Otherwise, we'll get filenames
+# suggested when hitting tab.
+bind -u complete &>/dev/null
+
 # via https://github.com/dylanaraps/pure-bash-bible
 _dirname() {
     # Usage: dirname "path"
