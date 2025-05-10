@@ -1,29 +1,35 @@
 load '../node_modules/bats-support/load'
 load '../node_modules/bats-assert/load'
 
-setup() {
-  PATH="lib/:$PATH"
-  source lib/parse.bash
+# Initial test setup. We do this outside a setup() function because it's slow to
+# rerun before every test.
+PATH="lib/:$PATH"
+source lib/parse.bash
 
-  syntax yell = verb::yell
+syntax yell = verb::yell
 
-  syntax look = verb::look
-  syntax look OBJ = verb::look
-  syntax look in OBJ = verb::look-inside
-  syntax look at OBJ = verb::look
+syntax look = verb::look
+syntax look OBJ = verb::look
+syntax look in OBJ = verb::look-inside
+syntax look at OBJ = verb::look
 
-  syntax go OBJ = verb::go
+syntax go OBJ = verb::go
 
-  syntax take OBJ = verb::take
+syntax take OBJ = verb::take
 
-  syntax attack OBJ with OBJ = verb::attack
+syntax attack OBJ with OBJ = verb::attack
 
-  nouns::define object::box -s box
-  nouns::define object::north -s north
-  nouns::define object::stick -t the -s stick
-  nouns::define object::troll -t the -a angry -s troll
-  nouns::define object::sword -t the -s sword
-}
+nouns::define object::box -s box
+nouns::define object::north -s north
+nouns::define object::stick -t the -s stick
+nouns::define object::troll -t the -a angry -s troll
+nouns::define object::sword -t the -s sword
+
+# Mark key globals readonly just to make sure we don't inadvertently mutate them
+# during the tests.
+readonly PATH
+readonly syntax_tree
+readonly nouns
 
 @test "parse standalone verb 'look'" {
   run parse::main look
