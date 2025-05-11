@@ -78,15 +78,6 @@ complete?() {
   [[ -v syntax_tree["$1"] ]] && [[ "${syntax_tree["$1"]}" != "" ]]
 }
 
-# article? tests if the given string is an article. currently only "the" is
-# supported
-article?() {
-  # TODO support other articles
-
-  # XXX there's no way this can be this simple
-  [[ "$1" == the ]]
-}
-
 # get-verb returns the verb specified by the syntax_tree
 get-verb() {
   local prefix
