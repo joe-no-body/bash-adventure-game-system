@@ -2,7 +2,7 @@
 # make shellcheck be quiet.
 dobject=
 iobject=
-rawverb=
+raw_verb=
 
 verb::look() {
   # "look"
@@ -24,7 +24,7 @@ verb::look() {
 verb::go() {
   local direction='' destination=''
 
-  case "$rawverb" in
+  case "$raw_verb" in
     n|north) direction=north ;;
     e|east) direction=east ;;
     s|south) direction=south ;;

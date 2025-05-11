@@ -134,11 +134,12 @@ parse() {
     return 1
   fi
 
-  # We store the exact verb provided by the player in `rawverb` for cases where
-  # we want to handle aliases or synonyms in special ways.
+  # We store the exact verb provided by the player in `raw_verb` for cases where
+  # the verb action function wants to handle aliases or synonyms in special
+  # ways. Note that this is a shared variable.
   #
   # shellcheck disable=SC2034
-  local rawverb="$word"
+  raw_verb="$word"
 
   # `prefix` contains the parsed prefix of the user's command in canonical form
   # (i.e. the form we expect to see in `syntax_tree`). For example, after
