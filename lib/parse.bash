@@ -120,7 +120,7 @@ parse() {
   iobject=
 
   local -a words=("$@")
-  local nwords="$#"
+  local num_words="$#"
 
   # `word` stores the current word being parsed and is updated in each iteration
   # of the loop below. The -l flag converts `word` to lowercase for ease of
@@ -164,7 +164,7 @@ parse() {
 
   # We use a C-style for loop so we can easily skip forward or backward in the
   # array of input words.
-  for (( idx=1; idx < nwords; idx++ )); do
+  for (( idx=1; idx < num_words; idx++ )); do
     word="${words[idx]}"
     raw_prefix="$raw_prefix $word"
 
