@@ -138,7 +138,7 @@ parse() {
   # we want to handle aliases or synonyms in special ways.
   #
   # shellcheck disable=SC2034
-  rawverb="$1"
+  local rawverb="$word"
 
   # `prefix` contains the parsed prefix of the user's command in canonical form
   # (i.e. the form we expect to see in `syntax_tree`). For example, after
@@ -149,11 +149,11 @@ parse() {
   # a prefix at the last iteration of the loop. The point is that we want to
   # successively match entries in syntax_tree that represent prefixes of a valid
   # command until we finally match a full valid command.)
-  prefix="$word"
+  local prefix="$word"
 
   # `raw_prefix` contains the parsed prefix of the user's command in the
   # verbatim form that they entered it.
-  raw_prefix="$1"  # store the original form for error reporting
+  local raw_prefix="$word"  # store the original form for error reporting
 
   # Declare loop local variables.
   local -i idx  # current word index
