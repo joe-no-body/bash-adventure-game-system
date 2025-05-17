@@ -4,8 +4,8 @@
 
 # ensure the namespace is unpolluted
 \export PATH=""  # purge the path of everything but the BAGS source
-\unalias -a                   # clear any aliases the user might have set
-hash -r                       # purge the command hash table
+\unalias -a      # clear any aliases the user might have set
+hash -r          # purge the command hash table
 
 # set stricter error handling
 set -o errexit
@@ -24,9 +24,11 @@ set -o noglob
 # suggested when hitting tab.
 bind -u complete &>/dev/null
 
-# via https://github.com/dylanaraps/pure-bash-bible
-_dirname() {
-    # Usage: dirname "path"
+# dirname is a POSIX standard command, but this is supposed to be *pure* Bash,
+# so we use this implementation from https://github.com/dylanaraps/pure-bash-bible.
+#
+# Usage: dirname <path>
+dirname() {
     local tmp=${1:-.}
 
     [[ $tmp != *[!/]* ]] && {
@@ -48,7 +50,7 @@ _dirname() {
 }
 
 if [[ ! -v BAGS_LIB_DIR ]]; then
-  BAGS_LIB_DIR="$(_dirname "${BASH_SOURCE[0]}")"
+  BAGS_LIB_DIR="$(dirname "${BASH_SOURCE[0]}")"
 fi
 
 # override PATH
